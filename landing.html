@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#050814">
+  <title>LIGHT-BESPOKE | 유니버설 조명 관제 배포 센터</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: #050814;
+      color: #e8eaf6;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+
+    /* Hexagon canvas (fixed bg) */
+    #hexCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Main scroll container */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px 48px;
+    }
+
+    /* LB Logo SVG */
+    .logo-wrap {
+      margin-bottom: 22px;
+      position: relative;
+    }
+    .logo-wrap svg {
+      filter: drop-shadow(0 0 22px rgba(0,210,255,0.55)) drop-shadow(0 0 60px rgba(0,160,220,0.25));
+      animation: logoPulse 3.5s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+      0%, 100% { filter: drop-shadow(0 0 18px rgba(0,210,255,0.5)) drop-shadow(0 0 50px rgba(0,160,220,0.2)); }
+      50%       { filter: drop-shadow(0 0 32px rgba(0,220,255,0.8)) drop-shadow(0 0 80px rgba(0,180,240,0.4)); }
+    }
+
+    /* Title */
+    .title {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-align: center;
+      background: linear-gradient(135deg, #62dfff 0%, #ffffff 55%, #a0cfff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      text-shadow: none;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: rgba(180,200,240,0.7);
+      text-align: center;
+      letter-spacing: 0.04em;
+      margin-bottom: 5px;
+    }
+    .desc {
+      font-size: 11px;
+      color: rgba(130,155,200,0.55);
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    /* OS Banner */
+    .os-banner {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(0,200,255,0.12);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-family: monospace;
+      color: rgba(180,220,255,0.7);
+      margin-bottom: 22px;
+    }
+    .os-pulse { animation: osPulse 2s ease-in-out infinite; color: #00d4ff; }
+    @keyframes osPulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    /* Download panel */
+    .dl-panel {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(5,12,30,0.75);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 22px 18px 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(200,220,255,0.75);
+      text-align: center;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+
+    /* OS Buttons row */
+    .os-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .os-btn {
+      flex: 1;
+      padding: 14px 8px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: transform 0.1s, opacity 0.1s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .os-btn:active { transform: scale(0.96); opacity: 0.85; }
+    .os-btn-ios {
+      background: linear-gradient(145deg, #1a5ccc, #0f3fa0);
+      box-shadow: 0 4px 20px rgba(30,90,200,0.4);
+    }
+    .os-btn-android {
+      background: linear-gradient(145deg, #1e9e50, #0d6e35);
+      box-shadow: 0 4px 20px rgba(30,160,80,0.4);
+    }
+    .os-btn i { font-size: 20px; color: #fff; }
+    .os-btn .btn-label { font-size: 11px; font-weight: 700; color: #fff; text-align: center; line-height: 1.4; }
+    .os-btn .btn-sub { font-size: 9px; color: rgba(255,255,255,0.6); text-align: center; }
+
+    /* Install button */
+    .install-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(0,210,255,0.5);
+      background: rgba(0,150,200,0.08);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      margin-bottom: 16px;
+      color: inherit;
+      text-decoration: none;
+    }
+    .install-btn:hover, .install-btn:focus { background: rgba(0,180,240,0.14); border-color: rgba(0,220,255,0.7); }
+    .install-btn:active { transform: scale(0.98); }
+    .install-icon-ring {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(0,210,255,0.6);
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,150,200,0.15);
+      box-shadow: 0 0 20px rgba(0,200,255,0.25);
+      animation: ringPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes ringPulse {
+      0%,100%{ box-shadow:0 0 16px rgba(0,200,255,0.2); }
+      50%{ box-shadow:0 0 30px rgba(0,220,255,0.5); }
+    }
+    .install-icon-ring i { font-size: 22px; color: #00d4ff; }
+    .install-label { font-size: 13px; font-weight: 700; color: rgba(180,225,255,0.85); }
+
+    /* Protocol badges */
+    .proto-row {
+      display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 18px;
+    }
+    .proto-badge {
+      font-size: 9px; font-family: monospace; font-weight: 700;
+      padding: 3px 7px; border-radius: 3px; letter-spacing: 0.05em;
+    }
+    .pb-godox  { background:rgba(0,229,255,0.08); border:1px solid rgba(0,229,255,0.25); color:#00e5ff; }
+    .pb-apt    { background:rgba(255,215,0,0.07);  border:1px solid rgba(255,215,0,0.22);  color:#ffd700; }
+    .pb-nan    { background:rgba(180,200,255,0.07);border:1px solid rgba(180,200,255,0.2); color:#c8d4ff; }
+
+    /* Footer note */
+    .foot-note {
+      font-size: 10px;
+      color: rgba(100,120,160,0.55);
+      text-align: center;
+      margin-top: 20px;
+      max-width: 320px;
+    }
+
+    /* neon-active class for highlight */
+    .neon-active {
+      border-color: #00f0ff !important;
+      box-shadow: 0 0 0 1px rgba(0,240,255,0.15), 0 6px 28px rgba(0,200,255,0.25) !important;
+    }
+
+    /* Guide button */
+    .guide-btn {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 12px;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(180,210,255,0.75);
+      letter-spacing: 0.04em;
+      transition: background 0.15s, border-color 0.15s;
+      text-decoration: none;
+    }
+    .guide-btn:hover { background: rgba(255,255,255,0.07); border-color: rgba(0,200,255,0.25); }
+    .guide-btn:active { transform: scale(0.98); }
+    .guide-btn i { font-size: 15px; color: rgba(0,200,255,0.7); }
+
+    /* Guide Modal */
+    #guideModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,5,18,0.92);
+      z-index: 800;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .guide-inner {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px 18px 60px;
+    }
+    .guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .guide-header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: #e0eeff;
+    }
+    .guide-header-title i { color: #00d4ff; }
+    .guide-close {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      color: #888;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.1s;
+    }
+    .guide-close:hover { background: rgba(255,255,255,0.1); color: #ccc; }
+
+    /* Step cards */
+    .step-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 16px 16px 14px;
+      margin-bottom: 10px;
+    }
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(0,180,255,0.15);
+      border: 1px solid rgba(0,200,255,0.35);
+      font-size: 10px;
+      font-weight: 900;
+      color: #00d4ff;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #c8dcff;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .step-title i { margin-right: 7px; font-size: 13px; }
+    .step-body {
+      font-size: 11px;
+      color: rgba(170,195,240,0.65);
+      line-height: 1.85;
+      padding-left: 30px;
+    }
+    .step-body b { color: rgba(220,235,255,0.85); font-weight: 700; }
+    .step-body .chip {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: monospace;
+      margin: 0 2px;
+      vertical-align: middle;
+    }
+    .chip-g { background:rgba(0,229,255,0.1); border:1px solid rgba(0,229,255,0.3); color:#00e5ff; }
+    .chip-a { background:rgba(255,215,0,0.09); border:1px solid rgba(255,215,0,0.28); color:#ffd700; }
+    .chip-n { background:rgba(180,200,255,0.08);border:1px solid rgba(180,200,255,0.25);color:#c8d4ff; }
+
+    /* Compat table */
+    .compat-section {
+      margin-top: 18px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .compat-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: rgba(180,210,255,0.6);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .compat-brand {
+      margin-bottom: 10px;
+    }
+    .compat-brand-name {
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .compat-devices {
+      font-size: 10px;
+      color: rgba(150,180,230,0.55);
+      line-height: 1.9;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: #131f35;
+      border: 1px solid rgba(0,200,255,0.35);
+      color: #a0d8ff;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.22s, transform 0.22s;
+      z-index: 9999;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Animated hexagon background -->
+<canvas id="hexCanvas"></canvas>
+
+<div class="page">
+
+  <!-- LB Hexagonal Logo (SVG inline) -->
+  <div class="logo-wrap">
+    <svg width="110" height="110" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lbG1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#00e0ff"/>
+          <stop offset="100%" stop-color="#0080cc"/>
+        </linearGradient>
+        <filter id="lbGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Outer hexagon frame -->
+      <polygon points="55,4 98,28.5 98,81.5 55,106 12,81.5 12,28.5"
+               fill="none" stroke="url(#lbG1)" stroke-width="2.5" filter="url(#lbGlow)"/>
+      <!-- Mid hexagon -->
+      <polygon points="55,16 87,34 87,70 55,88 23,70 23,34"
+               fill="none" stroke="rgba(0,200,255,0.45)" stroke-width="1.5"/>
+      <!-- Inner hexagon -->
+      <polygon points="55,28 77,40.5 77,65.5 55,78 33,65.5 33,40.5"
+               fill="rgba(0,150,220,0.08)" stroke="rgba(0,180,255,0.3)" stroke-width="1"/>
+      <!-- Cross-lines (targeting reticle) -->
+      <line x1="55" y1="28" x2="55" y2="78" stroke="rgba(0,200,255,0.2)" stroke-width="1"/>
+      <line x1="33" y1="40.5" x2="77" y2="65.5" stroke="rgba(0,200,255,0.2)" stroke-width="1"/>
+      <line x1="77" y1="40.5" x2="33" y2="65.5" stroke="rgba(0,200,255,0.2)" stroke-width="1"/>
+      <!-- Center aperture arcs -->
+      <circle cx="55" cy="55" r="13" fill="none" stroke="url(#lbG1)" stroke-width="2" filter="url(#lbGlow)"/>
+      <circle cx="55" cy="55" r="6" fill="rgba(0,220,255,0.15)" stroke="rgba(0,200,255,0.5)" stroke-width="1.5"/>
+      <!-- Signal arcs (wifi) -->
+      <path d="M 46,51 A 13 13 0 0 1 64,51" fill="none" stroke="rgba(0,200,255,0.6)" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M 42,47 A 18 18 0 0 1 68,47" fill="none" stroke="rgba(0,180,255,0.35)" stroke-width="2" stroke-linecap="round"/>
+      <!-- Outer corner marks -->
+      <line x1="55" y1="4" x2="55" y2="12" stroke="rgba(0,200,255,0.7)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="98" y1="28.5" x2="91" y2="32.5" stroke="rgba(0,200,255,0.5)" stroke-width="2" stroke-linecap="round"/>
+      <line x1="98" y1="81.5" x2="91" y2="77.5" stroke="rgba(0,200,255,0.5)" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <!-- Title & Subtitle -->
+  <div class="title">LIGHT-BESPOKE</div>
+  <div class="subtitle">유니버설 조명 통합 관제 OS</div>
+  <div class="desc">현장의 모든 조명, 이제 단 하나의 앱으로 마스터하세요.</div>
+
+  <!-- OS Detection Banner -->
+  <div class="os-banner">
+    <i class="fa-solid fa-microchip os-pulse"></i>
+    <span id="os-text">디바이스 환경 스캔 중...</span>
+  </div>
+
+  <!-- Protocol badges -->
+  <div class="proto-row">
+    <span class="proto-badge pb-godox">Godox BLE-3.1</span>
+    <span class="proto-badge pb-apt">Aputure NUS-2.4</span>
+    <span class="proto-badge pb-nan">Nanlite UART-1.9</span>
+  </div>
+
+  <!-- Download Panel -->
+  <div class="dl-panel">
+    <div class="panel-title">운영체제 선택 및 다운로드</div>
+
+    <!-- iOS + Android buttons -->
+    <div class="os-row">
+      <a id="btn-ios" href="https://apps.apple.com/us/app/bluefy-web-ble-browser/id1492822055"
+         target="_blank" class="os-btn os-btn-ios">
+        <i class="fa-brands fa-apple"></i>
+        <div class="btn-label">Download for iOS</div>
+        <div class="btn-sub">Bluefy / Chrome</div>
+      </a>
+      <button id="btn-android" onclick="triggerPwaInstallation()" class="os-btn os-btn-android">
+        <i class="fa-brands fa-android"></i>
+        <div class="btn-label">Download for Android</div>
+        <div class="btn-sub">Chrome 설치</div>
+      </button>
+    </div>
+
+    <!-- App install button -->
+    <button id="installBtn" class="install-btn" onclick="handleInstall()">
+      <div class="install-icon-ring">
+        <i class="fa-solid fa-download" id="installIcon"></i>
+      </div>
+      <div class="install-label">앱 설치 시작</div>
+    </button>
+
+    <!-- iOS URL copy (shown only on iOS) -->
+    <button id="iosCopyBtn" onclick="copyCurrentUrl()"
+            style="display:none;width:100%;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);cursor:pointer;display:none;align-items:center;gap:8px;color:rgba(180,210,255,0.6);font-size:11px;font-weight:700;margin-top:10px">
+      <i class="fa-solid fa-link" style="color:#00d4ff;font-size:13px"></i>
+      <span>Bluefy에서 열 링크 복사</span>
+      <i class="fa-regular fa-copy" style="margin-left:auto;font-size:12px"></i>
+    </button>
+
+  </div>
+
+  <!-- 사용방법 버튼 -->
+  <button class="guide-btn" onclick="openGuide()">
+    <i class="fa-solid fa-book-open"></i>
+    사용방법
+  </button>
+
+  <div class="foot-note">
+    <i class="fa-solid fa-circle-info" style="margin-right:4px;color:rgba(100,140,180,0.4)"></i>
+    촬영 현장 공유 시 QR 코드 또는 본 링크 주소를 전송하십시오.
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     사용방법 가이드 모달
+══════════════════════════════════ -->
+<div id="guideModal">
+  <div class="guide-inner">
+
+    <div class="guide-header">
+      <div class="guide-header-title">
+        <i class="fa-solid fa-book-open"></i>
+        LIGHT-BESPOKE 사용방법
+      </div>
+      <button class="guide-close" onclick="closeGuide()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">1</span>
+        <i class="fa-solid fa-download" style="color:#00d4ff"></i>앱 설치
+      </div>
+      <div class="step-body">
+        <b>Android</b> — Chrome 브라우저에서 이 페이지를 열고 <b>앱 설치 시작</b> 버튼을 탭하세요. 홈 화면에 아이콘이 생성됩니다.<br>
+        <b>iOS</b> — Safari는 Web Bluetooth를 지원하지 않습니다. App Store에서 <b>Bluefy</b> 앱을 설치한 뒤, Bluefy 내에서 이 페이지 URL을 열어주세요.<br>
+        <b>PC (Chrome/Edge)</b> — 별도 설치 없이 브라우저에서 바로 실행 가능합니다. Web Bluetooth 지원 필수.
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">2</span>
+        <i class="fa-brands fa-bluetooth" style="color:#00d4ff"></i>BLE 페어링
+      </div>
+      <div class="step-body">
+        1. 앱 상단의 <b>PAIR</b> 버튼을 탭합니다.<br>
+        2. 조명 전원을 켜고 Bluetooth 모드를 활성화하세요.<br>
+        3. 팝업 목록에서 연결할 기기를 선택합니다.<br>
+        4. 연결되면 카드가 자동으로 생성되고 <b style="color:#00e676">●</b> 녹색 상태 표시등이 켜집니다.<br>
+        <b>지원 브랜드:</b><br>
+        <span class="chip chip-g">GODOX</span> SL / FL / MG / TL / KNOWLED 시리즈<br>
+        <span class="chip chip-a">APUTURE</span> AL / Amaran / LS / Nova / MC 시리즈<br>
+        <span class="chip chip-n">NANLITE</span> Pavo / Forza / FS / Halo / MixPad 시리즈
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">3</span>
+        <i class="fa-solid fa-sliders" style="color:#00d4ff"></i>조명 제어
+      </div>
+      <div class="step-body">
+        카드를 탭해서 펼치면 4개의 제어 탭이 나타납니다.<br><br>
+        <b>CCT 탭</b> — 색온도(K)와 밝기(%)를 슬라이더로 조정합니다.<br>
+        <b>HSI 탭</b> — RGB 지원 기기 전용. 컬러 휠을 터치하거나 Hue·Sat·Intensity 슬라이더로 색상을 설정합니다.<br>
+        <b>FX 탭</b> — 플래시·캔들·TV·폭풍 등 특수 효과를 선택하고 속도를 조절합니다.<br>
+        <b>LX 탭</b> — 번개 엔진. TAP / HOLD / AUTO 모드와 SLOW·MED·FAST·STORM 속도로 리듬 플래시를 연출합니다.
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">4</span>
+        <i class="fa-solid fa-broadcast-tower" style="color:#00d4ff"></i>마스터 컨트롤
+      </div>
+      <div class="step-body">
+        하단 <b>MASTER</b> 버튼을 탭하면 연결된 <b>모든 조명을 동시에</b> 제어할 수 있습니다.<br><br>
+        · 마스터 디머 슬라이더로 전체 밝기를 0~100%로 조정<br>
+        · 마스터 CCT로 전체 색온도를 일괄 변경<br>
+        · <b>ALL OFF</b> 버튼으로 즉시 전체 소등<br>
+        · <b>SYNC ALL</b>로 모든 기기에 현재 설정값을 재동기화<br>
+        · <b>BROADCAST FLASH</b> 버튼으로 전체 기기에 동시 플래시
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">5</span>
+        <i class="fa-solid fa-map" style="color:#00d4ff"></i>2D 맵 뷰
+      </div>
+      <div class="step-body">
+        상단 우측 <b>맵 아이콘</b>을 탭하면 촬영 공간을 시각화한 2D 맵으로 전환됩니다.<br><br>
+        · 각 조명 노드를 <b>드래그</b>하여 실제 위치에 배치할 수 있습니다.<br>
+        · 노드를 <b>탭</b>하면 해당 기기의 컨트롤 시트가 아래에서 올라옵니다.<br>
+        · 노드 색상이 현재 조명 색상을 실시간으로 반영합니다.<br>
+        · 위치는 자동 저장되어 다음 실행 시 복원됩니다.
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">6</span>
+        <i class="fa-solid fa-layer-group" style="color:#00d4ff"></i>그룹 관리
+      </div>
+      <div class="step-body">
+        상단 탭 바 우측의 <b>＋ 버튼</b>을 탭하면 그룹을 생성할 수 있습니다.<br><br>
+        · 여러 기기를 선택해 하나의 그룹으로 묶으세요.<br>
+        · 그룹 탭을 선택하면 해당 기기들만 목록에 표시됩니다.<br>
+        · <b>ALL</b> 탭은 전체, <b>GODOX / APUTURE / NANLITE</b> 탭은 브랜드별 필터링입니다.
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="step-card">
+      <div class="step-title">
+        <span class="step-num">7</span>
+        <i class="fa-solid fa-rotate" style="color:#00d4ff"></i>자동 재연결 및 복원
+      </div>
+      <div class="step-body">
+        연결이 끊어지면 <b>자동으로 15회</b> 재연결을 시도합니다 (지수 백오프 방식).<br><br>
+        · 재연결 성공 시 이전 밝기·색온도·색상을 <b>자동 복원</b>합니다.<br>
+        · 이전에 연결했던 기기 목록은 앱을 닫아도 <b>로컬에 저장</b>됩니다.<br>
+        · 배터리 잔량과 신호 강도는 <b>40초마다</b> 자동 갱신됩니다.
+      </div>
+    </div>
+
+    <!-- Compatibility -->
+    <div class="compat-section">
+      <div class="compat-title">지원 기기 목록</div>
+
+      <div class="compat-brand">
+        <div class="compat-brand-name" style="color:#00e5ff">
+          <span class="chip chip-g">GODOX</span>
+        </div>
+        <div class="compat-devices">
+          SL60W · SL100D · SL150W · SL200W · FL60 · FL100 · FL150R<br>
+          MG1200Bi · MG400Bi · MS60C · MS300V<br>
+          TL30 · TL60 · LA200D · LA200Bi · LE200<br>
+          KNOWLED M600D · M300D · C300C · C600C
+        </div>
+      </div>
+
+      <div class="compat-brand">
+        <div class="compat-brand-name" style="color:#ffd700">
+          <span class="chip chip-a">APUTURE</span>
+        </div>
+        <div class="compat-devices">
+          Amaran 100d/200d/300d · AL-F7 · AL-MX<br>
+          LS C120d · LS 600d/600c · Nova P300c · Nova P600c<br>
+          Infini 200B · MC · MC Pro · B7c<br>
+          F22C · T2C · T4C · T8C · P60C · P120C
+        </div>
+      </div>
+
+      <div class="compat-brand">
+        <div class="compat-brand-name" style="color:#c8d4ff">
+          <span class="chip chip-n">NANLITE</span>
+        </div>
+        <div class="compat-devices">
+          Pavo Tube II · Pavo Slim 120C · Forza 60B · Forza 300B<br>
+          FS-60C · FS-150C · FS-300C · FC-300B<br>
+          Halo 16 · Halo 14C · MixPad II · MixPad 11C<br>
+          Compac 20C · LitoLite 5C · LitoLite 5e
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom close -->
+    <button onclick="closeGuide()"
+            style="width:100%;margin-top:20px;padding:14px;border-radius:10px;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.2);color:rgba(180,220,255,0.7);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.04em;">
+      <i class="fa-solid fa-xmark" style="margin-right:7px"></i>닫기
+    </button>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════
+   HEXAGON CANVAS — 정적 그리드 (번쩍임 없음)
+══════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('hexCanvas');
+  const ctx = canvas.getContext('2d');
+  const HEX_R = 34;
+
+  function drawGrid(W, H) {
+    ctx.clearRect(0, 0, W, H);
+    const colW = HEX_R * Math.sqrt(3);
+    const rowH = HEX_R * 1.5;
+    const cols = Math.ceil(W / colW) + 4;
+    const rows = Math.ceil(H / rowH) + 3;
+
+    for (let row = -2; row < rows; row++) {
+      for (let col = -2; col < cols; col++) {
+        const cx = col * colW + (row % 2 === 0 ? colW / 2 : 0);
+        const cy = row * rowH;
+
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = Math.PI / 180 * (60 * i - 30);
+          const x = cx + (HEX_R - 1) * Math.cos(a);
+          const y = cy + (HEX_R - 1) * Math.sin(a);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fillStyle   = 'rgba(0,100,180,0.04)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,160,220,0.10)';
+        ctx.lineWidth   = 1;
+        ctx.stroke();
+      }
+    }
+  }
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawGrid(canvas.width, canvas.height);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+})();
+
+
+/* ══════════════════════════════════
+   OS DETECTION & BRIDGE ACTIVATION
+══════════════════════════════════ */
+let _deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredPrompt = e;
+  const icon = document.getElementById('installIcon');
+  if (icon) { icon.className = 'fa-solid fa-circle-plus'; }
+});
+
+window.addEventListener('appinstalled', () => {
+  _deferredPrompt = null;
+  showToast('홈 화면에 추가 완료!');
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  detectOS();
+  const urlPrev = document.getElementById('urlPreview');
+  if (urlPrev) urlPrev.textContent = location.href;
+});
+
+function detectOS() {
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  const osEl = document.getElementById('os-text');
+
+  function activate(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('neon-active');
+    el.style.transform = 'scale(1.015)';
+  }
+
+  if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
+    if (osEl) osEl.textContent = 'iOS (iPhone/iPad) 환경 감지 완료';
+    activate('btn-ios');
+    const copyBtn = document.getElementById('iosCopyBtn');
+    if (copyBtn) copyBtn.style.display = 'flex';
+  } else if (/android/i.test(ua)) {
+    if (osEl) osEl.textContent = 'Android 디바이스 환경 감지 완료';
+    activate('btn-android');
+    const installBtn = document.getElementById('installBtn');
+    if (installBtn) installBtn.classList.add('neon-active');
+  } else {
+    if (osEl) osEl.textContent = 'Desktop (PC/Mac) 환경 감지 완료';
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.classList.add('neon-active');
+  }
+}
+
+function handleInstall() {
+  if (_deferredPrompt) {
+    triggerPwaInstallation();
+  } else {
+    window.location.href = './app.html';
+  }
+}
+
+async function triggerPwaInstallation() {
+  if (!_deferredPrompt) { window.location.href = './app.html'; return; }
+  _deferredPrompt.prompt();
+  const { outcome } = await _deferredPrompt.userChoice;
+  _deferredPrompt = null;
+  if (outcome === 'accepted') showToast('앱 설치 시작!');
+}
+
+function copyCurrentUrl() {
+  const url = location.href.replace('landing.html', 'app.html');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => showToast('링크 복사 완료'));
+  } else {
+    const el = document.createElement('textarea');
+    el.value = url; el.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    showToast('링크 복사 완료');
+  }
+}
+
+/* ══════════════════════════════════
+   GUIDE MODAL
+══════════════════════════════════ */
+function openGuide() {
+  const m = document.getElementById('guideModal');
+  m.style.display = 'block';
+  m.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+function closeGuide() {
+  document.getElementById('guideModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+// 모달 바깥쪽 탭으로도 닫기
+document.getElementById('guideModal').addEventListener('click', function(e) {
+  if (e.target === this) closeGuide();
+});
+
+let _tt;
+function showToast(msg, dur = 2500) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), dur);
+}
+</script>
+</body>
+</html>
