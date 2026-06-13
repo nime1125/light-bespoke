@@ -1,0 +1,93 @@
+{
+  "version": "2025.06",
+  "updated": "2025-06-13",
+  "note": "LIGHT-BESPOKE Master Device Profile DB — update after NAB(May) / IBC(Oct)",
+  "brands": {
+    "godox": {
+      "protocol": "CRC8-Maxim",
+      "svc": "0000fff0-0000-1000-8000-00805f9b34fb",
+      "tx":  "0000fff1-0000-1000-8000-00805f9b34fb",
+      "rx":  "0000fff2-0000-1000-8000-00805f9b34fb",
+      "devices": [
+        {"model":"SL60W",    "series":"SL",      "year":2019,"features":["CCT"],"cct":[5600,5600],"prefix":["SL60W","GODOX_SL60"]},
+        {"model":"SL100D",   "series":"SL",      "year":2020,"features":["CCT"],"cct":[5600,5600],"prefix":["SL100D"]},
+        {"model":"SL150W",   "series":"SL",      "year":2019,"features":["CCT"],"cct":[5600,5600],"prefix":["SL150W"]},
+        {"model":"SL200W",   "series":"SL",      "year":2019,"features":["CCT"],"cct":[5600,5600],"prefix":["SL200W"]},
+        {"model":"FL60",     "series":"FL",      "year":2020,"features":["CCT","RGB"],"cct":[2800,6500],"prefix":["FL60","GODOX_FL60"]},
+        {"model":"FL100",    "series":"FL",      "year":2020,"features":["CCT","RGB"],"cct":[2800,6500],"prefix":["FL100"]},
+        {"model":"FL150R",   "series":"FL",      "year":2021,"features":["CCT","RGB"],"cct":[2800,6500],"prefix":["FL150R"]},
+        {"model":"MG1200Bi", "series":"KNOWLED", "year":2023,"features":["CCT"],"cct":[2700,6500],"prefix":["MG1200","GODOX_MG1200"]},
+        {"model":"MG400Bi",  "series":"KNOWLED", "year":2023,"features":["CCT"],"cct":[2700,6500],"prefix":["MG400"]},
+        {"model":"MS60C",    "series":"KNOWLED", "year":2023,"features":["CCT","RGB","FX"],"cct":[2700,8500],"prefix":["MS60C","GODOX_MS60C"]},
+        {"model":"MS300V",   "series":"KNOWLED", "year":2024,"features":["CCT","FX"],"cct":[2700,6500],"prefix":["MS300V"]},
+        {"model":"TL30",     "series":"TL",      "year":2022,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["TL30","GODOX_TL30"]},
+        {"model":"TL60",     "series":"TL",      "year":2022,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["TL60"]},
+        {"model":"LA200D",   "series":"LA",      "year":2022,"features":["CCT"],"cct":[5600,5600],"prefix":["LA200D"]},
+        {"model":"LA200Bi",  "series":"LA",      "year":2022,"features":["CCT"],"cct":[2700,6500],"prefix":["LA200Bi"]},
+        {"model":"LE200",    "series":"LE",      "year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["LE200"]},
+        {"model":"M600D",    "series":"KNOWLED", "year":2022,"features":["CCT"],"cct":[5600,5600],"prefix":["M600D","KNOWLED_M600"]},
+        {"model":"M300D",    "series":"KNOWLED", "year":2022,"features":["CCT"],"cct":[5600,5600],"prefix":["M300D"]},
+        {"model":"C300C",    "series":"KNOWLED", "year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["C300C"]},
+        {"model":"C600C",    "series":"KNOWLED", "year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["C600C"]}
+      ]
+    },
+    "aputure": {
+      "protocol": "NUS·XOR",
+      "svc": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+      "tx":  "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+      "rx":  "6e400003-b5a3-f393-e0a9-e50e24dcca9e",
+      "devices": [
+        {"model":"Amaran 100d",  "series":"Amaran","year":2022,"features":["CCT"],"cct":[2700,6500],"prefix":["Amaran 100d","AL-MX"]},
+        {"model":"Amaran 200d",  "series":"Amaran","year":2022,"features":["CCT"],"cct":[2700,6500],"prefix":["Amaran 200d"]},
+        {"model":"Amaran 300c",  "series":"Amaran","year":2023,"features":["CCT","RGB"],"cct":[2500,7500],"prefix":["Amaran 300c"]},
+        {"model":"Amaran 60d",   "series":"Amaran","year":2023,"features":["CCT"],"cct":[2700,6500],"prefix":["Amaran 60d"]},
+        {"model":"Amaran 60x",   "series":"Amaran","year":2023,"features":["CCT","RGB"],"cct":[2700,7500],"prefix":["Amaran 60x"]},
+        {"model":"Amaran 100x",  "series":"Amaran","year":2023,"features":["CCT","RGB"],"cct":[2700,7500],"prefix":["Amaran 100x"]},
+        {"model":"Amaran 200x",  "series":"Amaran","year":2023,"features":["CCT","RGB"],"cct":[2700,7500],"prefix":["Amaran 200x"]},
+        {"model":"AL-F7",        "series":"AL",    "year":2020,"features":["CCT","RGB"],"cct":[3200,9900],"prefix":["AL-F7"]},
+        {"model":"AL-MX",        "series":"AL",    "year":2021,"features":["CCT","RGB"],"cct":[3200,6500],"prefix":["AL-MX"]},
+        {"model":"LS C120d II",  "series":"LS",    "year":2021,"features":["CCT"],"cct":[5500,5500],"prefix":["C120d","LS C120"]},
+        {"model":"LS 300d II",   "series":"LS",    "year":2021,"features":["CCT"],"cct":[5500,5500],"prefix":["300d","LS 300"]},
+        {"model":"LS 600d Pro",  "series":"LS",    "year":2021,"features":["CCT"],"cct":[5500,5500],"prefix":["600d","LS 600d"]},
+        {"model":"LS 600c Pro",  "series":"LS",    "year":2021,"features":["CCT","RGB"],"cct":[2000,10000],"prefix":["600c","LS 600c"]},
+        {"model":"Nova P300c",   "series":"Nova",  "year":2021,"features":["CCT","RGB"],"cct":[2000,10000],"prefix":["Nova P300c","P300c"]},
+        {"model":"Nova P600c",   "series":"Nova",  "year":2022,"features":["CCT","RGB"],"cct":[2000,10000],"prefix":["Nova P600c","P600c"]},
+        {"model":"MC",           "series":"MC",    "year":2020,"features":["CCT","RGB"],"cct":[3200,6500],"prefix":["Aputure MC","MC "]},
+        {"model":"MC Pro",       "series":"MC",    "year":2022,"features":["CCT","RGB"],"cct":[2500,9900],"prefix":["MC Pro"]},
+        {"model":"F22C",         "series":"Infini","year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["F22C","Aputure F22"]},
+        {"model":"T2C",          "series":"Infini","year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["T2C"]},
+        {"model":"T4C",          "series":"Infini","year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["T4C"]},
+        {"model":"P60C",         "series":"Infini","year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["P60C"]},
+        {"model":"B7c",          "series":"Amaran","year":2022,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["B7c","Amaran B7"]}
+      ]
+    },
+    "nanlite": {
+      "protocol": "FA55·UART",
+      "svc": "0000ffe0-0000-1000-8000-00805f9b34fb",
+      "tx":  "0000ffe1-0000-1000-8000-00805f9b34fb",
+      "rx":  "0000ffe1-0000-1000-8000-00805f9b34fb",
+      "devices": [
+        {"model":"Pavo Tube II 6C",  "series":"Pavo",    "year":2022,"features":["CCT","RGB","FX"],"cct":[2700,7500],"prefix":["PavoTube II 6","Pavo Tube"]},
+        {"model":"Pavo Tube II 30C", "series":"Pavo",    "year":2022,"features":["CCT","RGB","FX"],"cct":[2700,7500],"prefix":["PavoTube II 30"]},
+        {"model":"Pavo Slim 120C",   "series":"Pavo",    "year":2023,"features":["CCT","RGB","FX"],"cct":[2700,7500],"prefix":["Pavo Slim","PavoSlim"]},
+        {"model":"Forza 60B",        "series":"Forza",   "year":2021,"features":["CCT"],"cct":[2700,6500],"prefix":["Forza 60B","FORZA60B"]},
+        {"model":"Forza 150B",       "series":"Forza",   "year":2022,"features":["CCT"],"cct":[2700,6500],"prefix":["Forza 150B"]},
+        {"model":"Forza 300B",       "series":"Forza",   "year":2022,"features":["CCT"],"cct":[2700,6500],"prefix":["Forza 300B"]},
+        {"model":"Forza 500B",       "series":"Forza",   "year":2023,"features":["CCT"],"cct":[2700,6500],"prefix":["Forza 500B"]},
+        {"model":"FS-60C",           "series":"FS",      "year":2022,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["FS-60C","FS60C"]},
+        {"model":"FS-150C",          "series":"FS",      "year":2022,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["FS-150C"]},
+        {"model":"FS-300C",          "series":"FS",      "year":2022,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["FS-300C"]},
+        {"model":"FC-300B",          "series":"FC",      "year":2022,"features":["CCT"],"cct":[2700,6500],"prefix":["FC-300B"]},
+        {"model":"Halo 16",          "series":"Halo",    "year":2021,"features":["CCT"],"cct":[3200,5600],"prefix":["Halo 16","HALO16"]},
+        {"model":"Halo 14C",         "series":"Halo",    "year":2022,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["Halo 14C"]},
+        {"model":"MixPad II 27C",    "series":"MixPad",  "year":2022,"features":["CCT","RGB","FX"],"cct":[2700,6500],"prefix":["MixPad II","MixPad27"]},
+        {"model":"MixPad 11C",       "series":"MixPad",  "year":2023,"features":["CCT","RGB","FX"],"cct":[2700,6500],"prefix":["MixPad 11","MP11C"]},
+        {"model":"Compac 20C",       "series":"Compac",  "year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["Compac 20","Compac20C"]},
+        {"model":"LitoLite 5C",      "series":"LitoLite","year":2023,"features":["CCT","RGB"],"cct":[2700,6500],"prefix":["LitoLite 5C","LL5C"]},
+        {"model":"LitoLite 5e",      "series":"LitoLite","year":2023,"features":["CCT"],"cct":[3200,6500],"prefix":["LitoLite 5e"]},
+        {"model":"Pavotube Color 15C","series":"Pavo",   "year":2024,"features":["CCT","RGB","FX"],"cct":[2700,7500],"prefix":["Pavotube Color","PTC15C"]},
+        {"model":"SB-FT120B",        "series":"SB",      "year":2024,"features":["CCT"],"cct":[2700,6500],"prefix":["SB-FT120","SBFT120"]}
+      ]
+    }
+  }
+}

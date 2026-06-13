@@ -96,6 +96,44 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 .bnav-btn{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:9px;font-weight:700;letter-spacing:.06em;color:#333;border:none;background:none;transition:color .12s}
 .bnav-btn.on{color:#ff6b00}
+
+/* ── 기기추가 모달 ── */
+#suppModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:950;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.supp-inner{max-width:480px;margin:0 auto;padding:20px 16px 60px}
+.supp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #1e1e1e}
+.supp-title{font-size:15px;font-weight:900;letter-spacing:.06em;color:#dde0ec;display:flex;align-items:center;gap:8px}
+.supp-title i{color:#00e5ff}
+.supp-close{width:30px;height:30px;border-radius:50%;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;color:#555;font-size:13px;display:flex;align-items:center;justify-content:center}
+.supp-brand-row{display:flex;gap:6px;margin-bottom:14px}
+.supp-brand-btn{flex:1;padding:8px 4px;border-radius:6px;border:1px solid #1e1e1e;background:#111;cursor:pointer;font-size:10px;font-weight:800;letter-spacing:.06em;color:#444;transition:all .12s;text-align:center}
+.supp-brand-btn.on.godox{border-color:#00e5ff;color:#00e5ff;background:rgba(0,229,255,.07)}
+.supp-brand-btn.on.aputure{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,.07)}
+.supp-brand-btn.on.nanlite{border-color:#c8d4ff;color:#c8d4ff;background:rgba(200,212,255,.07)}
+.supp-search-row{display:flex;gap:6px;margin-bottom:14px}
+.supp-input{flex:1;background:#111;border:1px solid #252525;border-radius:7px;padding:10px 12px;color:#dde0ec;font-size:13px;outline:none;transition:border-color .15s}
+.supp-input:focus{border-color:#00e5ff}
+.supp-input::placeholder{color:#333}
+.supp-results{display:flex;flex-direction:column;gap:8px;min-height:80px}
+.supp-item{background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;transition:border-color .12s}
+.supp-item:hover{border-color:#2a2a2a}
+.supp-item-info{flex:1;min-width:0}
+.supp-item-model{font-size:13px;font-weight:800;color:#dde0ec}
+.supp-item-meta{font-size:10px;color:#444;margin-top:3px;line-height:1.6}
+.supp-item-meta b{color:#666}
+.supp-apply-btn{flex-shrink:0;padding:7px 12px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:.04em;cursor:pointer;border:none;transition:all .12s}
+.supp-apply-btn.godox{background:rgba(0,229,255,.1);color:#00e5ff;border:1px solid rgba(0,229,255,.3)}
+.supp-apply-btn.aputure{background:rgba(255,215,0,.1);color:#ffd700;border:1px solid rgba(255,215,0,.3)}
+.supp-apply-btn.nanlite{background:rgba(200,212,255,.1);color:#c8d4ff;border:1px solid rgba(200,212,255,.3)}
+.supp-apply-btn:active{transform:scale(.95)}
+.supp-empty{padding:24px;text-align:center;color:#333;font-size:12px;line-height:1.7}
+.supp-manual{margin-top:14px;background:#0e0e0e;border:1px solid #1a1a1a;border-radius:8px;padding:14px}
+.supp-manual-title{font-size:10px;font-weight:800;color:#333;letter-spacing:.1em;margin-bottom:10px}
+.supp-manual input,.supp-manual select{width:100%;background:#111;border:1px solid #222;border-radius:5px;padding:8px 10px;color:#888;font-size:12px;outline:none;margin-bottom:7px}
+.supp-manual input:focus,.supp-manual select:focus{border-color:#444;color:#dde0ec}
+.supp-feat-row{display:flex;gap:5px;margin-bottom:10px}
+.supp-feat-chk{flex:1;padding:6px 3px;border-radius:4px;border:1px solid #1e1e1e;background:#111;cursor:pointer;font-size:9px;font-weight:700;color:#333;text-align:center;transition:all .12s}
+.supp-feat-chk.on{border-color:#444;color:#888;background:#1a1a1a}
+.supp-save-btn{width:100%;padding:11px;border-radius:6px;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.3);color:#ff6b00;font-size:12px;font-weight:800;letter-spacing:.05em;cursor:pointer}
 </style>
 </head>
 <body>
@@ -112,6 +150,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     <button id="vbtnMap" onclick="setView('map')" title="2D Map" style="width:32px;height:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:#141414;border:1px solid #222;color:#444;cursor:pointer"><i class="fa-solid fa-map" style="font-size:12px"></i></button>
     <button id="iosHint" onclick="showPairModal()" style="display:none;padding:0 10px;height:32px;border-radius:5px;border:1px solid #333;color:#888;font-size:11px;font-weight:700;background:#141414;cursor:pointer">iOS?</button>
     <button onclick="openValidation()" style="padding:0 10px;height:32px;border-radius:5px;border:1px solid #252525;color:#555;font-size:11px;font-weight:700;background:#141414;cursor:pointer">SPEC</button>
+    <button onclick="openSupp()" title="기기추가" style="padding:0 10px;height:32px;border-radius:5px;border:1px solid rgba(0,229,255,.25);color:#00e5ff;font-size:11px;font-weight:800;background:rgba(0,229,255,.06);cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fa-solid fa-screwdriver-wrench" style="font-size:10px"></i>기기추가</button>
     <button onclick="showPairModal()" style="padding:0 12px;height:32px;border-radius:5px;background:#ff6b00;color:#000;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;border:none"><i class="fa-solid fa-plus" style="font-size:10px"></i>PAIR</button>
   </div>
 </div>
@@ -348,6 +387,57 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 <div id="mapCtrlSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;align-items:flex-end;justify-content:center">
   <div id="mapCtrlContent" style="background:#141414;border:1px solid #252525;border-top-left-radius:16px;border-top-right-radius:16px;width:100%;max-width:480px;padding:16px 16px 32px;max-height:80vh;overflow-y:auto">
     <div style="width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 14px"></div>
+  </div>
+</div>
+
+<!-- ══ 기기추가 모달 ══ -->
+<div id="suppModal">
+  <div class="supp-inner">
+    <div class="supp-head">
+      <div class="supp-title"><i class="fa-solid fa-screwdriver-wrench"></i>기기추가</div>
+      <button class="supp-close" onclick="closeSupp()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- 브랜드 선택 -->
+    <div class="supp-brand-row">
+      <button class="supp-brand-btn godox on" id="sbrn_godox" onclick="setSuppBrand('godox')">GODOX</button>
+      <button class="supp-brand-btn aputure" id="sbrn_aputure" onclick="setSuppBrand('aputure')">APUTURE</button>
+      <button class="supp-brand-btn nanlite" id="sbrn_nanlite" onclick="setSuppBrand('nanlite')">NANLITE</button>
+    </div>
+
+    <!-- 검색 입력 -->
+    <div class="supp-search-row">
+      <input class="supp-input" id="suppInput" type="text"
+             placeholder="제품명 또는 시리즈 입력 (예: MS60C, Amaran 300c)"
+             oninput="onSuppSearch(this.value)">
+    </div>
+
+    <!-- 검색 결과 -->
+    <div class="supp-results" id="suppResults">
+      <div class="supp-empty"><i class="fa-solid fa-magnifying-glass" style="font-size:22px;color:#1e1e1e;display:block;margin-bottom:8px"></i>브랜드를 선택하고 제품명을 입력하세요</div>
+    </div>
+
+    <!-- 직접 입력 섹션 -->
+    <div class="supp-manual">
+      <div class="supp-manual-title"><i class="fa-solid fa-pen" style="margin-right:5px"></i>목록에 없는 기기 직접 입력</div>
+      <input id="m_model" type="text" placeholder="모델명 (예: SL200III)">
+      <input id="m_prefix" type="text" placeholder="BLE 기기명 prefix (예: SL200, GODOX_SL)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px">
+        <input id="m_cctMin" type="number" placeholder="최저 색온도 K (예: 2700)">
+        <input id="m_cctMax" type="number" placeholder="최고 색온도 K (예: 6500)">
+      </div>
+      <div style="font-size:9px;color:#333;font-weight:700;letter-spacing:.08em;margin-bottom:6px">지원 기능</div>
+      <div class="supp-feat-row">
+        <div class="supp-feat-chk on" id="fc_cct" onclick="toggleFeat('cct')">CCT</div>
+        <div class="supp-feat-chk" id="fc_rgb" onclick="toggleFeat('rgb')">RGB</div>
+        <div class="supp-feat-chk" id="fc_fx" onclick="toggleFeat('fx')">FX</div>
+      </div>
+      <button class="supp-save-btn" onclick="saveManualProfile()"><i class="fa-solid fa-floppy-disk" style="margin-right:6px"></i>커스텀 프로파일 저장</button>
+    </div>
+
+    <div style="margin-top:12px;font-size:10px;color:#252525;text-align:center">
+      저장된 프로파일은 BLE 스캔 시 자동으로 적용됩니다
+    </div>
   </div>
 </div>
 
@@ -854,7 +944,158 @@ function openValidation(){
   document.getElementById('specModal').style.display='block';
 }
 
-function savePersist(){try{const s={};for(const[id,d]of Object.entries(DEV))s[id]={...d};localStorage.setItem('swm4',JSON.stringify(s));}catch(e){console.warn('[persist save]',e.message);}}
+/* ══════════════════════════════════════════════════
+   기기추가 (SUPPLEMENT)
+══════════════════════════════════════════════════ */
+let _suppDB = null;          // 마스터 DB 캐시
+let _suppBrand = 'godox';    // 현재 선택 브랜드
+let _suppFeats = ['cct'];    // 직접입력 선택 기능
+
+async function openSupp() {
+  document.getElementById('suppModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  if (!_suppDB) await loadSuppDB();
+  setSuppBrand('godox');
+}
+function closeSupp() {
+  document.getElementById('suppModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('suppModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSupp();
+});
+
+async function loadSuppDB() {
+  // GitHub Pages에서 마스터 DB fetch, 실패 시 localStorage 캐시 사용
+  const CACHE_KEY = 'lb_devDB';
+  try {
+    const baseURL = location.origin + location.pathname.replace(/\/[^\/]*$/, '/');
+    const res = await fetch(baseURL + 'devices-master.json', { cache: 'no-cache' });
+    if (res.ok) {
+      _suppDB = await res.json();
+      localStorage.setItem(CACHE_KEY, JSON.stringify(_suppDB));
+      toast('프로파일 DB 업데이트 완료 · v' + _suppDB.version);
+    }
+  } catch(e) {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) { _suppDB = JSON.parse(cached); toast('캐시된 프로파일 DB 사용 중'); }
+    else toast('프로파일 DB 로드 실패 — 네트워크 확인');
+  }
+}
+
+function setSuppBrand(brand) {
+  _suppBrand = brand;
+  ['godox','aputure','nanlite'].forEach(b => {
+    const el = document.getElementById('sbrn_' + b);
+    if (el) { el.classList.toggle('on', b === brand); }
+  });
+  document.getElementById('suppInput').value = '';
+  renderSuppResults([]);
+}
+
+function onSuppSearch(val) {
+  if (!_suppDB || val.trim().length < 1) { renderSuppResults([]); return; }
+  const q = val.toLowerCase().trim();
+  const brandData = _suppDB.brands[_suppBrand];
+  if (!brandData) return;
+  const results = brandData.devices.filter(d =>
+    d.model.toLowerCase().includes(q) ||
+    d.series.toLowerCase().includes(q) ||
+    (d.prefix || []).some(p => p.toLowerCase().includes(q))
+  ).slice(0, 8);
+  renderSuppResults(results);
+}
+
+function renderSuppResults(results) {
+  const el = document.getElementById('suppResults');
+  if (!results.length) {
+    el.innerHTML = '<div class="supp-empty"><i class="fa-solid fa-magnifying-glass" style="font-size:22px;color:#1e1e1e;display:block;margin-bottom:8px"></i>검색 결과 없음 — 아래 직접 입력란을 사용하세요</div>';
+    return;
+  }
+  const brandColor = { godox:'#00e5ff', aputure:'#ffd700', nanlite:'#c8d4ff' };
+  el.innerHTML = results.map(d => {
+    const feats = d.features.join(' · ');
+    const cct = d.cct ? d.cct[0] + 'K ~ ' + d.cct[1] + 'K' : '—';
+    const isCustom = getCustomProfiles().find(c => c.model === d.model && c.brand === _suppBrand);
+    return `<div class="supp-item">
+      <div class="supp-item-info">
+        <div class="supp-item-model" style="color:${brandColor[_suppBrand]}">${d.model}
+          <span style="font-size:9px;color:#333;font-weight:700;margin-left:6px">${d.series} ${d.year}</span>
+          ${isCustom ? '<span style="font-size:9px;color:#00e676;margin-left:5px">✓ 적용됨</span>' : ''}
+        </div>
+        <div class="supp-item-meta">
+          <b>기능</b> ${feats} &nbsp;·&nbsp; <b>CCT</b> ${cct}
+        </div>
+        <div class="supp-item-meta" style="font-family:monospace;font-size:9px">
+          prefix: ${(d.prefix||[]).slice(0,2).join(', ')}
+        </div>
+      </div>
+      <button class="supp-apply-btn ${_suppBrand}" onclick="applySuppProfile(${JSON.stringify(d).replace(/"/g,'&quot;')})">
+        ${isCustom ? '재적용' : '적용'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function applySuppProfile(device) {
+  const profile = {
+    brand: _suppBrand,
+    model: device.model,
+    series: device.series,
+    year: device.year,
+    features: device.features,
+    cct: device.cct,
+    prefix: device.prefix,
+    addedAt: new Date().toISOString()
+  };
+  saveCustomProfile(profile);
+  toast(device.model + ' 프로파일 적용 완료');
+  onSuppSearch(document.getElementById('suppInput').value); // 결과 갱신
+}
+
+function toggleFeat(feat) {
+  const el = document.getElementById('fc_' + feat);
+  if (!el) return;
+  if (_suppFeats.includes(feat)) {
+    if (_suppFeats.length === 1) return; // 최소 1개
+    _suppFeats = _suppFeats.filter(f => f !== feat);
+  } else {
+    _suppFeats.push(feat);
+  }
+  el.classList.toggle('on', _suppFeats.includes(feat));
+}
+
+function saveManualProfile() {
+  const model  = document.getElementById('m_model').value.trim();
+  const prefix = document.getElementById('m_prefix').value.trim();
+  const cctMin = parseInt(document.getElementById('m_cctMin').value) || 3200;
+  const cctMax = parseInt(document.getElementById('m_cctMax').value) || 5600;
+  if (!model) { toast('모델명을 입력해주세요'); return; }
+  const profile = {
+    brand: _suppBrand, model, series: 'CUSTOM',
+    features: [..._suppFeats].map(f => f.toUpperCase()),
+    cct: [cctMin, cctMax],
+    prefix: prefix ? prefix.split(',').map(p => p.trim()) : [model],
+    addedAt: new Date().toISOString(),
+    manual: true
+  };
+  saveCustomProfile(profile);
+  toast(model + ' 커스텀 프로파일 저장 완료');
+  ['m_model','m_prefix','m_cctMin','m_cctMax'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+}
+
+function getCustomProfiles() {
+  try { return JSON.parse(localStorage.getItem('lb_custProf') || '[]'); } catch(e) { return []; }
+}
+function saveCustomProfile(profile) {
+  const list = getCustomProfiles().filter(p => !(p.model === profile.model && p.brand === profile.brand));
+  list.push(profile);
+  localStorage.setItem('lb_custProf', JSON.stringify(list));
+}
+
+try{const s={};for(const[id,d]of Object.entries(DEV))s[id]={...d};localStorage.setItem('swm4',JSON.stringify(s));}catch(e){console.warn('[persist save]',e.message);}}
 function loadPersist(){try{const raw=localStorage.getItem('swm4');if(!raw)return;const s=JSON.parse(raw);for(const[id,d]of Object.entries(s))DEV[id]={...d,connected:false,status:'offline',expanded:false};renderHome();console.log('[persist] Restored',Object.keys(s).length,'devices');}catch(e){console.warn('[persist load]',e.message);}}
 
 function init(){
