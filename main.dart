@@ -260,7 +260,7 @@ class LightController {
     _manualDisconnect = false;
     _listenConn();
     PacketLogger.I.log('${adapter.brand} 연결 시도...');
-    await device.connect(timeout: const Duration(seconds: 10), autoConnect: false);
+    await device.connect(timeout: const Duration(seconds: 10), autoConnect: false, license: License.free);
     await _discover();
     await _silentSync();
     _reconnectAttempt = 0;
@@ -365,7 +365,7 @@ class LightController {
     Future.delayed(Duration(seconds: delay), () async {
       if (_manualDisconnect) return;
       try {
-        await device.connect(timeout: const Duration(seconds: 10), autoConnect: false);
+        await device.connect(timeout: const Duration(seconds: 10), autoConnect: false, license: License.free);
         await _discover();
         await _silentSync();
         _reconnectAttempt = 0;
