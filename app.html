@@ -521,7 +521,7 @@ function nlS(buf){let s=0;for(const b of buf)s=(s+b)&0xFFFF;return s;}
 function pktBr(brand,pct){const v=Math.round(Math.max(0,Math.min(100,pct))*2.55)&0xFF;if(brand==='aputure')return[0x55,0xAA,0x07,0x01,0x01,v,0x00,0x00,0x00,xorS([0x07,0x01,0x01,v,0x00,0x00,0x00])];if(brand==='nanlite'){const d=[0xFA,0x55,0x01,0x01,0x00,v];const cs=nlS(d.slice(2));return[...d,(cs>>8)&0xFF,cs&0xFF,0x0D,0x0A];}if(brand==='godox'){const p=[0x02,0x01,v];return[0x01,...p,crc8M(p)];}return[];}
 function pktCCT(brand,cct,cmin,cmax){const r=(cct-cmin)/(cmax-cmin),v=Math.round(r*255)&0xFF;if(brand==='aputure')return[0x55,0xAA,0x07,0x01,0x02,v,0x00,0x00,0x00,xorS([0x07,0x01,0x02,v,0x00,0x00,0x00])];if(brand==='nanlite'){const d=[0xFA,0x55,0x01,0x02,0x00,v];const cs=nlS(d.slice(2));return[...d,(cs>>8)&0xFF,cs&0xFF,0x0D,0x0A];}if(brand==='godox'){const p=[0x02,0x02,v];return[0x01,...p,crc8M(p)];}return[];}
 function pktRGB(brand,h,s,lum){const[r,g,b]=hsl2rgb(h,s,lum/2);if(brand==='aputure')return[0x55,0xAA,0x0A,0x01,0x08,r,g,b,0x00,0x00,0x00,0x00,xorS([0x0A,0x01,0x08,r,g,b,0x00,0x00,0x00,0x00])];if(brand==='nanlite'){const d=[0xFA,0x55,0x03,0x01,0x00,r,0x00,g,0x00,b];const cs=nlS(d.slice(2));return[...d,(cs>>8)&0xFF,cs&0xFF,0x0D,0x0A];}if(brand==='godox'){const p=[0x05,r,g,b];return[0x01,...p,crc8M(p)];}return[];}
-function pktFX(brand,fxId,speed){const s=Math.round(Math.max(0,Math.min(100,speed))*2.55)&0xFF;if(brand==='aputure')return[0x55,0xAA,0x08,0x01,0x10,fxId,s,0x00,0x00,xorS([0x08,0x01,0x10,fxId,s,0x00,0x00])];if(brand==='nanlite'){const d=[0xFA,0x55,0x06,0x01,0x00,fxId,s];const cs=nlS(d.slice(2));return[...d,(cs>>8)&0xFF,cs&0xFF,0x0D,0x0A];}if(brand==='godox'){const p=[0x07,fxId,s];return[0x01,...p,crc8M(p)];}return[];}
+function pktFX(brand,fxId,speed,cy,ad){const s=Math.round(Math.max(0,Math.min(100,speed))*2.55)&0xFF;cy=cy||0;ad=ad||0;if(brand==='aputure')return[0x55,0xAA,0x08,0x01,0x10,fxId,s,cy,ad,xorS([0x08,0x01,0x10,fxId,s,cy,ad])];if(brand==='nanlite'){const d=[0xFA,0x55,0x08,0x01,0x00,fxId,s,cy,ad];const cs=nlS(d.slice(2));return[...d,(cs>>8)&0xFF,cs&0xFF,0x0D,0x0A];}if(brand==='godox'){const p=[0x07,fxId,s,cy,ad];return[0x01,...p,crc8M(p)];}return[];}
 
 function hsl2rgb(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l);const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return[Math.round(f(0)*255),Math.round(f(8)*255),Math.round(f(4)*255)];}
 function pct2hex(v){return'0x'+Math.round(v*2.55).toString(16).toUpperCase().padStart(2,'0');}
@@ -645,7 +645,7 @@ async function connectDev(device){
     else{DEV[id].connected=true;DEV[id].lastSync=Date.now();}
     device.addEventListener('gattserverdisconnected',()=>onDisconn(id));
     toast(name+' 연결됨');cble('[CONNECTED]',name,fb,cap);
-    savePersist();renderHome();forceRestore(id);startPoll();_ra[id]=0;
+    savePersist();renderHome();forceRestore(id);startPoll();startHeartbeat();_ra[id]=0;
   }catch(e){console.error('[connectDev]',e.message);toast('오류: '+e.message,3500);queueReconn(id,device);}
 }
 function onDisconn(id){if(DEV[id]){DEV[id].connected=false;DEV[id].status='disconnected';}delete GATT[id];renderHome();toast('연결 끊김...',3000);queueReconn(id);}
@@ -666,6 +666,25 @@ function removeDev(id){delete DEV[id];delete GATT[id];const c=document.getElemen
 
 let _pollT=null;
 function startPoll(){if(_pollT)return;_pollT=setInterval(pollAll,40000);}
+
+// ===== Keep-alive (연결 유지) =====
+// 일부 BLE 기기는 유휴 시 연결을 끊으므로, 주기적으로 가벼운 패킷(현재 밝기, 무변화)을
+// 보내 링크를 살아있게 유지하고 끊김을 조기에 감지해 재연결을 트리거한다.
+let _hbT=null;
+function startHeartbeat(){if(_hbT)return;_hbT=setInterval(heartbeat,8000);}
+async function heartbeat(){
+  for(const id of Object.keys(DEV)){
+    const d=DEV[id],g=GATT[id];
+    if(!d||!d.connected||!g)continue;
+    // 최근 5초 내 통신이 있었으면 건너뜀(사용자 조작과 충돌 방지)
+    if(Date.now()-(d.lastSync||0)<5000)continue;
+    // 끊김 조기 감지
+    if(g.server&&g.server.connected===false){onDisconn(id);continue;}
+    // 멱등(무변화) keep-alive: 현재 밝기 재전송
+    const b=pktBr(d.brand,d.br);
+    if(b&&b.length){const ok=await writeBLE(id,b);if(ok)d.lastSync=Date.now();else if(g.server&&!g.server.connected)onDisconn(id);}
+  }
+}
 async function pollAll(){const ids=Object.keys(DEV);for(const id of ids){if(!DEV[id].connected)continue;await pollOne(id);}renderHome();}
 async function pollOne(id){
   const g=GATT[id],d=DEV[id];if(!g||!d)return;
@@ -761,13 +780,26 @@ function buildEfxHTML(id){
   else h+='<div style="font-size:10px;color:var(--bd4);padding:2px 0 4px">저장된 씬이 없습니다 — 현재 설정을 저장해보세요.</div>';
   h+='</div>';return h;
 }
-function sendEfx(id){const d=DEV[id];if(!d||!d.connected)return;if(d.fxId>0)writeNow(id,pktFX(d.brand,d.fxId,d.fxSpeed));}
+function efxCyAd(d){return[({one:0,two:1,reverse:2})[d.efxCycle]||0,({off:0,flash:1,rflash:2,pulse:3})[d.efxAddon]||0];}
+// 효과 전체 파라미터를 패킷으로 전송 (효과ID·속도·사이클·애드온 + 색/CCT + 밝기)
+// 주의: 3사 효과 패킷 사양은 공개 자료에 없어 앱 자체 규약을 확장한 것 — 실기기 HCI 캡처로 검증 필요
+function sendEfx(id){
+  const d=DEV[id];if(!d||!d.connected)return;const cfg=FDB[d.brand];
+  const ca=efxCyAd(d);
+  if(d.fxId>0)writeNow(id,pktFX(d.brand,d.fxId,d.fxSpeed,ca[0],ca[1]));
+  const cur=cfg.fx.find(f=>f.id===d.fxId);const P=efxParams(cur?cur.label:'');
+  if(P.hue&&P.sat){const b=pktRGB(d.brand,d.efxHue,d.efxSat,d.efxDim);if(b.length)setTimeout(()=>writeNow(id,b),60);}
+  else if(P.cct){const b=pktCCT(d.brand,d.efxCct,cfg.cctMin,cfg.cctMax);if(b.length)setTimeout(()=>writeNow(id,b),60);}
+  const bb=pktBr(d.brand,d.efxDim);if(bb.length)setTimeout(()=>writeNow(id,bb),120);
+}
+function efxSendColor(id){const d=DEV[id];if(!d||!d.connected)return;const b=pktRGB(d.brand,d.efxHue,d.efxSat,d.efxDim);if(b.length)dbSend(id,b);}
+function efxSendCct(id){const d=DEV[id];if(!d||!d.connected)return;const cfg=FDB[d.brand];const b=pktCCT(d.brand,d.efxCct,cfg.cctMin,cfg.cctMax);if(b.length)dbSend(id,b);}
 function efxStep(id,dir){const d=DEV[id],fxs=FDB[d.brand].fx;if(!fxs.length)return;let i=fxs.findIndex(f=>f.id===d.fxId);if(i<0)i=0;i=(i+dir+fxs.length)%fxs.length;d.fxId=fxs[i].id;sendEfx(id);d.dirty=true;savePersist();rebuildTab(id);}
-function onEfxDim(id,v){const d=DEV[id];d.efxDim=+v;const e=document.getElementById('efxDimV_'+id);if(e)e.textContent=v+'%';dbSend(id,pktBr(d.brand,+v));d.dirty=true;savePersist();}
-function onEfxHue(id,v){const d=DEV[id];d.efxHue=+v;const e=document.getElementById('efxHueV_'+id);if(e)e.textContent=v+'°';const s=document.getElementById('efxSatV_'+id);if(s){const sl=s.parentElement.nextElementSibling;if(sl&&sl.tagName==='INPUT')sl.style.background='linear-gradient(to right,#808080,hsl('+v+',100%,50%))';}sendEfx(id);savePersist();}
-function onEfxSat(id,v){const d=DEV[id];d.efxSat=+v;const e=document.getElementById('efxSatV_'+id);if(e)e.textContent=v+'%';sendEfx(id);savePersist();}
-function onEfxCct(id,v){const d=DEV[id];d.efxCct=+v;const e=document.getElementById('efxCctV_'+id);if(e)e.textContent=v+'K';sendEfx(id);savePersist();}
-function onEfxSpeed(id,v){const d=DEV[id];d.fxSpeed=+v;const e=document.getElementById('efxSpdV_'+id);if(e)e.textContent=v+'%';if(d.fxId>0)dbSend(id,pktFX(d.brand,d.fxId,+v));savePersist();}
+function onEfxDim(id,v){const d=DEV[id];d.efxDim=+v;d.br=+v;const e=document.getElementById('efxDimV_'+id);if(e)e.textContent=v+'%';dbSend(id,pktBr(d.brand,+v));d.dirty=true;savePersist();}
+function onEfxHue(id,v){const d=DEV[id];d.efxHue=+v;const e=document.getElementById('efxHueV_'+id);if(e)e.textContent=v+'°';const s=document.getElementById('efxSatV_'+id);if(s){const sl=s.parentElement.nextElementSibling;if(sl&&sl.tagName==='INPUT')sl.style.background='linear-gradient(to right,#808080,hsl('+v+',100%,50%))';}efxSendColor(id);savePersist();}
+function onEfxSat(id,v){const d=DEV[id];d.efxSat=+v;const e=document.getElementById('efxSatV_'+id);if(e)e.textContent=v+'%';efxSendColor(id);savePersist();}
+function onEfxCct(id,v){const d=DEV[id];d.efxCct=+v;const e=document.getElementById('efxCctV_'+id);if(e)e.textContent=v+'K';efxSendCct(id);savePersist();}
+function onEfxSpeed(id,v){const d=DEV[id];d.fxSpeed=+v;const e=document.getElementById('efxSpdV_'+id);if(e)e.textContent=v+'%';const ca=efxCyAd(d);if(d.fxId>0)dbSend(id,pktFX(d.brand,d.fxId,+v,ca[0],ca[1]));savePersist();}
 function efxCycle(id,c){DEV[id].efxCycle=c;['one','two','reverse'].forEach(x=>{const el=document.getElementById('efxcy_'+x+'_'+id);if(el)el.classList.toggle('on',x===c);});sendEfx(id);DEV[id].dirty=true;savePersist();}
 function efxAddon(id,a){DEV[id].efxAddon=a;['off','flash','rflash','pulse'].forEach(x=>{const el=document.getElementById('efxad_'+x+'_'+id);if(el)el.classList.toggle('on',x===a);});sendEfx(id);DEV[id].dirty=true;savePersist();}
 function onDHue(id,val){
@@ -841,7 +873,7 @@ function efxWheelPick(id,cx,cy){
   const d=DEV[id];d.efxHue=Math.round(angle);d.efxSat=sat;
   const hv=document.getElementById('efxHueV_'+id),sv=document.getElementById('efxSatV_'+id);
   if(hv)hv.textContent=d.efxHue+'°';if(sv)sv.textContent=d.efxSat+'%';
-  updateEfxCross(id);sendEfx(id);d.dirty=true;savePersist();
+  updateEfxCross(id);efxSendColor(id);d.dirty=true;savePersist();
 }
 function updateEfxCross(id){
   const d=DEV[id],canvas=document.getElementById('ewhl_'+id),cross=document.getElementById('ewhlC_'+id);
