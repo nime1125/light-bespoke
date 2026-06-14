@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="LIGHT-BESPOKE"/>
-<meta name="theme-color" content="#0a0a0a"/>
+<meta name="theme-color" content="#0A0A0A"/>
 <meta name="description" content="LIGHT-BESPOKE — Professional BLE Lighting Controller"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icon-192.png"/>
@@ -17,13 +17,20 @@
 <script>tailwind.config={theme:{extend:{}}}</script>
 <style>
 /* LIGHT-BESPOKE v4.2 — KNOWLED-Inspired Design System */
-:root{--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+:root{--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);
+  --bg-app:rgb(10,10,10);--bg-panel:rgb(15,15,15);--bg-panel2:rgb(12,12,12);--bg-card:rgb(22,22,22);--bg-sunken:rgb(17,17,17);--bg-btn:rgb(20,20,20);--bg-btn2:rgb(30,30,30);
+  --bd1:rgb(26,26,26);--bd2:rgb(34,34,34);--bd3:rgb(37,37,37);--bd4:rgb(51,51,51);
+  --tx1:rgb(221,224,236);--tx-soft:rgb(204,204,204);--tx-faint:rgb(58,58,58)}
+:root[data-theme=light]{
+  --bg-app:#eceef2;--bg-panel:#ffffff;--bg-panel2:#f5f6f9;--bg-card:#ffffff;--bg-sunken:#eef1f5;--bg-btn:#eef1f5;--bg-btn2:#e6e9ee;
+  --bd1:#e3e6eb;--bd2:#d7dbe1;--bd3:#cbd0d8;--bd4:#bcc2cb;
+  --tx1:#1b1d23;--tx-soft:#41454d;--tx-faint:#9aa0aa}
 *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:#0a0a0a;color:#dde0ec}
+html,body{height:100%;overflow:hidden;background:var(--bg-app);color:var(--tx1);transition:background .2s,color .2s}
 body{padding-top:var(--safe-t);display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;font-size:14px}
 
 .sig-bars{display:inline-flex;align-items:flex-end;gap:2px;height:14px;padding-bottom:1px}
-.sig-b{width:2.5px;border-radius:1px;background:#252525;transition:background .3s}
+.sig-b{width:2.5px;border-radius:1px;background:var(--bd3);transition:background .3s}
 .sig-b:nth-child(1){height:3px}.sig-b:nth-child(2){height:6px}.sig-b:nth-child(3){height:9px}.sig-b:nth-child(4){height:12px}.sig-b:nth-child(5){height:14px}
 .sig-bars.s5 .sig-b{background:#00e676}
 .sig-bars.s4 .sig-b:nth-child(-n+4){background:#00e676}
@@ -32,19 +39,19 @@ body{padding-top:var(--safe-t);display:flex;flex-direction:column;font-family:-a
 .sig-bars.s1 .sig-b:nth-child(1){background:#ff3b30}
 
 .wheel-wrap{position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto}
-canvas.whl{border-radius:50%;cursor:crosshair;touch-action:none;display:block;box-shadow:0 0 0 2px #252525}
+canvas.whl{border-radius:50%;cursor:crosshair;touch-action:none;display:block;box-shadow:0 0 0 2px var(--bd3)}
 .whl-cross{position:absolute;width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.8),0 2px 8px rgba(0,0,0,.9);transform:translate(-50%,-50%);pointer-events:none;transition:background .08s}
 
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;display:block}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid #0a0a0a;box-shadow:0 2px 8px rgba(0,0,0,.8)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid var(--bg-app);box-shadow:0 2px 8px rgba(0,0,0,.8)}
 .sl-hue{background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
 .sl-hue::-webkit-slider-thumb{background:#fff}
 .sl-sat::-webkit-slider-thumb{background:#fff}
-.sl-int{background:linear-gradient(to right,#111,#fff)}
+.sl-int{background:linear-gradient(to right,var(--bg-sunken),#fff)}
 .sl-int::-webkit-slider-thumb{background:#fff}
 .sl-cct{background:linear-gradient(to right,#ff8800,#fffce0,#aaccff)}
 .sl-cct::-webkit-slider-thumb{background:#93c5fd}
-.sl-br{background:linear-gradient(to right,#111,#ff6b00)}
+.sl-br{background:linear-gradient(to right,var(--bg-sunken),#ff6b00)}
 .sl-br::-webkit-slider-thumb{background:#ff6b00}
 
 .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s,box-shadow .3s}
@@ -56,23 +63,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .bdg{font-size:9px;font-weight:800;padding:2px 5px;border-radius:3px;letter-spacing:.06em;line-height:1;flex-shrink:0}
 .bdg-godox{background:#00e5ff;color:#000}
 .bdg-aputure{background:#ffd700;color:#000}
-.bdg-nanlite{background:#c8d4ff;color:#111}
+.bdg-nanlite{background:#c8d4ff;color:var(--bg-sunken)}
 
 #mapBg{position:absolute;inset:0;background:#0d0d0d;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:44px 44px}
 .mnode{position:absolute;width:64px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transform:translate(-50%,-50%);user-select:none;-webkit-user-select:none;touch-action:none}
-.mnode-ring{width:40px;height:40px;border-radius:50%;border:2px solid #333;display:flex;align-items:center;justify-content:center;transition:border-color .25s,box-shadow .25s}
+.mnode-ring{width:40px;height:40px;border-radius:50%;border:2px solid var(--bd4);display:flex;align-items:center;justify-content:center;transition:border-color .25s,box-shadow .25s}
 
 .card-body{display:none}
 .card-body.open{display:block}
 .card-chevron{transition:transform .2s}
 
-.skel{background:linear-gradient(90deg,#191919 25%,#222 50%,#191919 75%);background-size:200% 100%;animation:skelanim 1.5s infinite;border-radius:6px}
+.skel{background:linear-gradient(90deg,var(--bd1) 25%,var(--bd2) 50%,var(--bd1) 75%);background-size:200% 100%;animation:skelanim 1.5s infinite;border-radius:6px}
 @keyframes skelanim{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 .dev-tab{flex:1;padding:6px 4px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid transparent;color:#444;transition:all .1s;letter-spacing:.03em;text-align:center;background:none}
-.dev-tab.on{background:#252525;color:#dde0ec;border-color:#333}
+.dev-tab.on{background:var(--bd3);color:var(--tx1);border-color:var(--bd4)}
 
-.fx-tile{background:#171717;border:1px solid #222;border-radius:5px;padding:8px 3px;text-align:center;cursor:pointer;transition:all .1s;user-select:none}
+.fx-tile{background:#171717;border:1px solid var(--bd2);border-radius:5px;padding:8px 3px;text-align:center;cursor:pointer;transition:all .1s;user-select:none}
 .fx-tile.on{border-color:#ff6b00;background:rgba(255,107,0,.07)}
 .fx-tile:active{transform:scale(.9)}
 .fx-icon{font-size:14px;color:#555;margin-bottom:3px}
@@ -80,44 +87,64 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .fx-lbl{font-size:9px;color:#444;font-weight:600}
 .fx-tile.on .fx-lbl{color:#ff6b00}
 
-.lx-btn{flex:1;padding:7px 3px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid #2a2a2a;background:#141414;color:#444;text-align:center;transition:all .1s}
+.lx-btn{flex:1;padding:7px 3px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--bd3);background:var(--bg-btn);color:#444;text-align:center;transition:all .1s}
 .lx-btn.on{border-color:#ffd700;background:rgba(255,215,0,.07);color:#ffd700}
-.lx-fire{width:100%;padding:17px;border-radius:8px;font-size:15px;font-weight:800;letter-spacing:.04em;background:#111;border:2px solid #ffd700;color:#ffd700;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .08s,color .08s}
+/* 효과 페이지 — 하이브리드(오렌지 기본 + 선택/활성 그린 글로우 #46AA5F) */
+.efx-sel{display:flex;align-items:center;gap:8px}
+.efx-arw{width:36px;height:36px;flex-shrink:0;border-radius:9px;border:1px solid var(--bd3);background:var(--bg-btn);color:#46AA5F;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .12s}
+.efx-arw:hover{border-color:#46AA5F;box-shadow:0 0 9px rgba(70,170,95,.4)}
+.efx-arw:active{transform:scale(.92)}
+.efx-name{flex:1;min-width:0;text-align:center;padding:10px 6px;border-radius:9px;background:rgba(70,170,95,.08);border:1px solid rgba(70,170,95,.35);font-size:13px;font-weight:800;color:#5fd07f;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 0 12px rgba(70,170,95,.15)}
+.efx-seg{display:flex;gap:4px;margin-top:5px}
+.efx-sb{flex:1;padding:7px 3px;border-radius:5px;font-size:9.5px;font-weight:700;cursor:pointer;border:1px solid var(--bd3);background:var(--bg-btn);color:#555;text-align:center;transition:all .12s;letter-spacing:.02em}
+.efx-sb.on{border-color:#46AA5F;background:rgba(70,170,95,.12);color:#6fd98a;box-shadow:0 0 8px rgba(70,170,95,.22)}
+.efx-sb:active{transform:scale(.95)}
+.efx-grp-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-faint);text-transform:uppercase;margin:14px 0 4px}
+.efx-save{font-size:9px;font-weight:700;color:#46AA5F;background:rgba(70,170,95,.08);border:1px solid rgba(70,170,95,.3);border-radius:5px;padding:3px 9px;cursor:pointer;letter-spacing:.02em;transition:all .12s}
+.efx-save:hover{box-shadow:0 0 8px rgba(70,170,95,.3);border-color:#46AA5F}
+.efx-save:active{transform:scale(.95)}
+.efx-scenes{display:flex;flex-wrap:wrap;gap:5px}
+.efx-chip{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;color:#9fe6b3;background:rgba(70,170,95,.07);border:1px solid rgba(70,170,95,.28);border-radius:6px;padding:5px 9px;cursor:pointer;transition:all .12s;user-select:none}
+.efx-chip:hover{border-color:#46AA5F;box-shadow:0 0 8px rgba(70,170,95,.25)}
+.efx-chip:active{transform:scale(.96)}
+.efx-chip i{font-size:9px;color:#4a7a57}
+.efx-chip i:hover{color:#ff5a4d}
+.lx-fire{width:100%;padding:17px;border-radius:8px;font-size:15px;font-weight:800;letter-spacing:.04em;background:var(--bg-sunken);border:2px solid #ffd700;color:#ffd700;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .08s,color .08s}
 .lx-fire:active,.lx-fire.flash{background:#ffd700;color:#000}
 
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;overflow-y:auto}
 .modal-bg.flex-end{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;align-items:flex-end;justify-content:center}
 
-#toast{position:fixed;bottom:calc(62px + var(--safe-b) + 8px);left:50%;transform:translateX(-50%) translateY(8px);background:#232323;border:1px solid #333;color:#dde0ec;padding:8px 16px;border-radius:5px;font-size:12px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:9999;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
+#toast{position:fixed;bottom:calc(62px + var(--safe-b) + 8px);left:50%;transform:translateX(-50%) translateY(8px);background:#232323;border:1px solid var(--bd4);color:var(--tx1);padding:8px 16px;border-radius:5px;font-size:12px;font-weight:600;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;z-index:9999;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 .grp-tab{flex-shrink:0;padding:5px 13px;font-size:10px;font-weight:700;letter-spacing:.06em;border-radius:4px;cursor:pointer;color:#444;border:1px solid transparent;transition:all .13s;white-space:nowrap;background:none}
-.grp-tab.on{color:#fff;background:#1e1e1e;border-color:#333}
+.grp-tab.on{color:#fff;background:var(--bg-btn2);border-color:var(--bd4)}
 
-.bnav-btn{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:9px;font-weight:700;letter-spacing:.06em;color:#333;border:none;background:none;transition:color .12s}
+.bnav-btn{flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--bd4);border:none;background:none;transition:color .12s}
 .bnav-btn.on{color:#ff6b00}
 
 /* ── 기기추가 모달 ── */
 #suppModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:950;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .supp-inner{max-width:480px;margin:0 auto;padding:20px 16px 60px}
-.supp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #1e1e1e}
-.supp-title{font-size:15px;font-weight:900;letter-spacing:.06em;color:#dde0ec;display:flex;align-items:center;gap:8px}
+.supp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bg-btn2)}
+.supp-title{font-size:15px;font-weight:900;letter-spacing:.06em;color:var(--tx1);display:flex;align-items:center;gap:8px}
 .supp-title i{color:#00e5ff}
-.supp-close{width:30px;height:30px;border-radius:50%;background:#1a1a1a;border:1px solid #2a2a2a;cursor:pointer;color:#555;font-size:13px;display:flex;align-items:center;justify-content:center}
+.supp-close{width:30px;height:30px;border-radius:50%;background:var(--bd1);border:1px solid var(--bd3);cursor:pointer;color:#555;font-size:13px;display:flex;align-items:center;justify-content:center}
 .supp-brand-row{display:flex;gap:6px;margin-bottom:14px}
-.supp-brand-btn{flex:1;padding:8px 4px;border-radius:6px;border:1px solid #1e1e1e;background:#111;cursor:pointer;font-size:10px;font-weight:800;letter-spacing:.06em;color:#444;transition:all .12s;text-align:center}
+.supp-brand-btn{flex:1;padding:8px 4px;border-radius:6px;border:1px solid var(--bg-btn2);background:var(--bg-sunken);cursor:pointer;font-size:10px;font-weight:800;letter-spacing:.06em;color:#444;transition:all .12s;text-align:center}
 .supp-brand-btn.on.godox{border-color:#00e5ff;color:#00e5ff;background:rgba(0,229,255,.07)}
 .supp-brand-btn.on.aputure{border-color:#ffd700;color:#ffd700;background:rgba(255,215,0,.07)}
 .supp-brand-btn.on.nanlite{border-color:#c8d4ff;color:#c8d4ff;background:rgba(200,212,255,.07)}
 .supp-search-row{display:flex;gap:6px;margin-bottom:14px}
-.supp-input{flex:1;background:#111;border:1px solid #252525;border-radius:7px;padding:10px 12px;color:#dde0ec;font-size:13px;outline:none;transition:border-color .15s}
+.supp-input{flex:1;background:var(--bg-sunken);border:1px solid var(--bd3);border-radius:7px;padding:10px 12px;color:var(--tx1);font-size:13px;outline:none;transition:border-color .15s}
 .supp-input:focus{border-color:#00e5ff}
-.supp-input::placeholder{color:#333}
+.supp-input::placeholder{color:var(--bd4)}
 .supp-results{display:flex;flex-direction:column;gap:8px;min-height:80px}
-.supp-item{background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;transition:border-color .12s}
-.supp-item:hover{border-color:#2a2a2a}
+.supp-item{background:var(--bg-sunken);border:1px solid var(--bg-btn2);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;transition:border-color .12s}
+.supp-item:hover{border-color:var(--bd3)}
 .supp-item-info{flex:1;min-width:0}
-.supp-item-model{font-size:13px;font-weight:800;color:#dde0ec}
+.supp-item-model{font-size:13px;font-weight:800;color:var(--tx1)}
 .supp-item-meta{font-size:10px;color:#444;margin-top:3px;line-height:1.6}
 .supp-item-meta b{color:#666}
 .supp-apply-btn{flex-shrink:0;padding:7px 12px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:.04em;cursor:pointer;border:none;transition:all .12s}
@@ -125,44 +152,52 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .supp-apply-btn.aputure{background:rgba(255,215,0,.1);color:#ffd700;border:1px solid rgba(255,215,0,.3)}
 .supp-apply-btn.nanlite{background:rgba(200,212,255,.1);color:#c8d4ff;border:1px solid rgba(200,212,255,.3)}
 .supp-apply-btn:active{transform:scale(.95)}
-.supp-empty{padding:24px;text-align:center;color:#333;font-size:12px;line-height:1.7}
-.supp-manual{margin-top:14px;background:#0e0e0e;border:1px solid #1a1a1a;border-radius:8px;padding:14px}
-.supp-manual-title{font-size:10px;font-weight:800;color:#333;letter-spacing:.1em;margin-bottom:10px}
-.supp-manual input,.supp-manual select{width:100%;background:#111;border:1px solid #222;border-radius:5px;padding:8px 10px;color:#888;font-size:12px;outline:none;margin-bottom:7px}
-.supp-manual input:focus,.supp-manual select:focus{border-color:#444;color:#dde0ec}
+.supp-empty{padding:24px;text-align:center;color:var(--bd4);font-size:12px;line-height:1.7}
+.supp-manual{margin-top:14px;background:#0e0e0e;border:1px solid var(--bd1);border-radius:8px;padding:14px}
+.supp-manual-title{font-size:10px;font-weight:800;color:var(--bd4);letter-spacing:.1em;margin-bottom:10px}
+.supp-manual input,.supp-manual select{width:100%;background:var(--bg-sunken);border:1px solid var(--bd2);border-radius:5px;padding:8px 10px;color:#888;font-size:12px;outline:none;margin-bottom:7px}
+.supp-manual input:focus,.supp-manual select:focus{border-color:#444;color:var(--tx1)}
 .supp-feat-row{display:flex;gap:5px;margin-bottom:10px}
-.supp-feat-chk{flex:1;padding:6px 3px;border-radius:4px;border:1px solid #1e1e1e;background:#111;cursor:pointer;font-size:9px;font-weight:700;color:#333;text-align:center;transition:all .12s}
-.supp-feat-chk.on{border-color:#444;color:#888;background:#1a1a1a}
+.supp-feat-chk{flex:1;padding:6px 3px;border-radius:4px;border:1px solid var(--bg-btn2);background:var(--bg-sunken);cursor:pointer;font-size:9px;font-weight:700;color:var(--bd4);text-align:center;transition:all .12s}
+.supp-feat-chk.on{border-color:#444;color:#888;background:var(--bd1)}
 .supp-save-btn{width:100%;padding:11px;border-radius:6px;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.3);color:#ff6b00;font-size:12px;font-weight:800;letter-spacing:.05em;cursor:pointer}
 </style>
 </head>
 <body>
 
 <!-- TOPBAR -->
-<div style="flex-shrink:0;height:52px;background:#0f0f0f;border-bottom:1px solid #191919;display:flex;align-items:center;padding:0 14px;gap:8px">
+<div style="flex-shrink:0;height:52px;background:var(--bg-panel);border-bottom:1px solid var(--bd1);display:flex;align-items:center;padding:0 14px;gap:8px">
   <div style="display:flex;align-items:center;gap:8px;flex:1">
-    <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,#ff6b00,#cc1a00);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff">L</div>
-    <span style="font-size:17px;font-weight:800;letter-spacing:-.02em">LIGHT-BESPOKE</span>
+    <div style="width:31px;height:31px;border-radius:9px;background:linear-gradient(140deg,#FFA24B 0%,#FF6B00 52%,#E0431A 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 3px 11px rgba(255,107,0,.4)">
+      <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.32),rgba(255,255,255,0) 55%)"></div>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" style="position:relative">
+        <line x1="6" y1="3.5" x2="6" y2="20.5"/><circle cx="6" cy="9" r="2.5" fill="#fff" stroke="none"/>
+        <line x1="12" y1="3.5" x2="12" y2="20.5"/><circle cx="12" cy="14.5" r="2.5" fill="#fff" stroke="none"/>
+        <line x1="18" y1="3.5" x2="18" y2="20.5"/><circle cx="18" cy="8" r="2.5" fill="#fff" stroke="none"/>
+      </svg>
+    </div>
+    <span style="font-size:17px;font-weight:800;letter-spacing:-.01em;background:linear-gradient(115deg,#FF9D4D 0%,#FF6B00 42%,#46AA5F 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">LIGHT&#8209;BESPOKE</span>
     <span style="font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;color:#ff6b00;border:1px solid rgba(255,107,0,.3);background:rgba(255,107,0,.08);font-family:monospace">v4.2</span>
   </div>
   <div style="display:flex;gap:5px;align-items:center">
-    <button id="vbtnList" onclick="setView('list')" title="List" style="width:32px;height:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:#1e1e1e;border:1px solid #333;color:#ff6b00;cursor:pointer"><i class="fa-solid fa-list-ul" style="font-size:12px"></i></button>
-    <button id="vbtnMap" onclick="setView('map')" title="2D Map" style="width:32px;height:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:#141414;border:1px solid #222;color:#444;cursor:pointer"><i class="fa-solid fa-map" style="font-size:12px"></i></button>
-    <button id="iosHint" onclick="showPairModal()" style="display:none;padding:0 10px;height:32px;border-radius:5px;border:1px solid #333;color:#888;font-size:11px;font-weight:700;background:#141414;cursor:pointer">iOS?</button>
-    <button onclick="openValidation()" style="padding:0 10px;height:32px;border-radius:5px;border:1px solid #252525;color:#555;font-size:11px;font-weight:700;background:#141414;cursor:pointer">SPEC</button>
+    <button id="themeBtn" onclick="toggleTheme()" title="테마 전환" style="width:32px;height:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:var(--bg-btn);border:1px solid var(--bd2);color:var(--tx-soft);cursor:pointer"><i class="fa-solid fa-sun" style="font-size:12px"></i></button>
+    <button id="vbtnList" onclick="setView('list')" title="List" style="width:32px;height:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:var(--bg-btn2);border:1px solid var(--bd4);color:#ff6b00;cursor:pointer"><i class="fa-solid fa-list-ul" style="font-size:12px"></i></button>
+    <button id="vbtnMap" onclick="setView('map')" title="2D Map" style="width:32px;height:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:var(--bg-btn);border:1px solid var(--bd2);color:#444;cursor:pointer"><i class="fa-solid fa-map" style="font-size:12px"></i></button>
+    <button id="iosHint" onclick="showPairModal()" style="display:none;padding:0 10px;height:32px;border-radius:5px;border:1px solid var(--bd4);color:#888;font-size:11px;font-weight:700;background:var(--bg-btn);cursor:pointer">iOS?</button>
+    <button onclick="openValidation()" style="padding:0 10px;height:32px;border-radius:5px;border:1px solid var(--bd3);color:#555;font-size:11px;font-weight:700;background:var(--bg-btn);cursor:pointer">SPEC</button>
     <button onclick="openSupp()" title="기기추가" style="padding:0 10px;height:32px;border-radius:5px;border:1px solid rgba(0,229,255,.25);color:#00e5ff;font-size:11px;font-weight:800;background:rgba(0,229,255,.06);cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fa-solid fa-screwdriver-wrench" style="font-size:10px"></i>기기추가</button>
     <button onclick="showPairModal()" style="padding:0 12px;height:32px;border-radius:5px;background:#ff6b00;color:#000;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;border:none"><i class="fa-solid fa-plus" style="font-size:10px"></i>PAIR</button>
   </div>
 </div>
 
 <!-- GROUP TABS -->
-<div style="flex-shrink:0;background:#0c0c0c;border-bottom:1px solid #181818;display:flex;align-items:center;gap:4px;padding:6px 12px;overflow-x:auto;scrollbar-width:none">
+<div style="flex-shrink:0;background:var(--bg-panel2);border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:4px;padding:6px 12px;overflow-x:auto;scrollbar-width:none">
   <button class="grp-tab on" id="gtab_all" onclick="setTab('all')">ALL</button>
   <button class="grp-tab" id="gtab_godox" onclick="setTab('godox')">GODOX</button>
   <button class="grp-tab" id="gtab_aputure" onclick="setTab('aputure')">APUTURE</button>
   <button class="grp-tab" id="gtab_nanlite" onclick="setTab('nanlite')">NANLITE</button>
   <span id="extraTabs" style="display:contents"></span>
-  <button onclick="showGroupPanel()" style="flex-shrink:0;width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid #222;color:#3a3a3a;background:none;cursor:pointer;margin-left:2px"><i class="fa-solid fa-plus" style="font-size:10px"></i></button>
+  <button onclick="showGroupPanel()" style="flex-shrink:0;width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd2);color:var(--tx-faint);background:none;cursor:pointer;margin-left:2px"><i class="fa-solid fa-plus" style="font-size:10px"></i></button>
 </div>
 
 <!-- iOS NOTICE -->
@@ -179,27 +214,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
     <!-- STATS -->
     <div style="display:flex;gap:6px;padding:10px 12px 6px">
-      <div style="flex:1;background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:9px 8px;text-align:center">
+      <div style="flex:1;background:var(--bg-btn);border:1px solid var(--bg-btn2);border-radius:8px;padding:9px 8px;text-align:center">
         <div style="font-size:20px;font-weight:900;font-family:monospace;color:#fff" id="stat-total">0</div>
-        <div style="font-size:9px;color:#333;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">TOTAL</div>
+        <div style="font-size:9px;color:var(--bd4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">TOTAL</div>
       </div>
-      <div style="flex:1;background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:9px 8px;text-align:center">
+      <div style="flex:1;background:var(--bg-btn);border:1px solid var(--bg-btn2);border-radius:8px;padding:9px 8px;text-align:center">
         <div style="font-size:20px;font-weight:900;font-family:monospace;color:#00e676" id="stat-online">0</div>
-        <div style="font-size:9px;color:#333;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">ONLINE</div>
+        <div style="font-size:9px;color:var(--bd4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">ONLINE</div>
       </div>
-      <div style="flex:1;background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:9px 8px;text-align:center">
+      <div style="flex:1;background:var(--bg-btn);border:1px solid var(--bg-btn2);border-radius:8px;padding:9px 8px;text-align:center">
         <div style="font-size:20px;font-weight:900;font-family:monospace;color:#ff9800" id="stat-offline">0</div>
-        <div style="font-size:9px;color:#333;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">OFFLINE</div>
+        <div style="font-size:9px;color:var(--bd4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">OFFLINE</div>
       </div>
-      <div style="flex:1;background:#141414;border:1px solid #1e1e1e;border-radius:8px;padding:9px 8px;text-align:center">
+      <div style="flex:1;background:var(--bg-btn);border:1px solid var(--bg-btn2);border-radius:8px;padding:9px 8px;text-align:center">
         <div style="font-size:20px;font-weight:900;font-family:monospace;color:#00e5ff" id="stat-brands">---</div>
-        <div style="font-size:9px;color:#333;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">BRANDS</div>
+        <div style="font-size:9px;color:var(--bd4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:2px">BRANDS</div>
       </div>
     </div>
 
     <!-- SKELETON LOADERS -->
     <div id="skelList" style="display:none;padding:0 12px">
-      <div style="background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="background:var(--bg-btn);border:1px solid var(--bg-btn2);border-radius:10px;padding:12px;margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <div class="skel" style="width:8px;height:8px;border-radius:50%"></div>
           <div class="skel" style="width:52px;height:14px"></div>
@@ -211,7 +246,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         <div class="skel" style="width:100%;height:6px;margin-bottom:6px;border-radius:3px"></div>
         <div class="skel" style="width:80%;height:6px;border-radius:3px"></div>
       </div>
-      <div style="background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:12px;margin-bottom:8px;opacity:.55">
+      <div style="background:var(--bg-btn);border:1px solid var(--bg-btn2);border-radius:10px;padding:12px;margin-bottom:8px;opacity:.55">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <div class="skel" style="width:8px;height:8px;border-radius:50%"></div>
           <div class="skel" style="width:44px;height:14px"></div>
@@ -222,7 +257,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         <div class="skel" style="width:45%;height:12px;margin-bottom:8px"></div>
         <div class="skel" style="width:100%;height:6px;border-radius:3px"></div>
       </div>
-      <div style="background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:12px;margin-bottom:8px;opacity:.3">
+      <div style="background:var(--bg-btn);border:1px solid var(--bg-btn2);border-radius:10px;padding:12px;margin-bottom:8px;opacity:.3">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <div class="skel" style="width:8px;height:8px;border-radius:50%"></div>
           <div class="skel" style="width:60px;height:14px"></div>
@@ -236,18 +271,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
     <!-- EMPTY STATE -->
     <div id="emptyState" style="padding:60px 24px;text-align:center">
-      <i class="fa-brands fa-bluetooth" style="font-size:52px;color:#1e1e1e;display:block;margin-bottom:14px"></i>
+      <i class="fa-brands fa-bluetooth" style="font-size:52px;color:var(--bg-btn2);display:block;margin-bottom:14px"></i>
       <div style="font-size:15px;font-weight:700;color:#2e2e2e;margin-bottom:6px">연결된 장비 없음</div>
-      <div style="font-size:12px;color:#252525;line-height:1.6">상단 PAIR 버튼으로 BLE 조명을 검색하세요</div>
+      <div style="font-size:12px;color:var(--bd3);line-height:1.6">상단 PAIR 버튼으로 BLE 조명을 검색하세요</div>
     </div>
 
     <!-- CONSOLE LOG -->
     <div style="padding:0 12px 10px;margin-top:4px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:#2a2a2a;text-transform:uppercase">BLE LOG</span>
-        <button onclick="clearCon()" style="font-size:9px;color:#333;border:1px solid #1e1e1e;padding:1px 7px;border-radius:3px;background:none;cursor:pointer">CLR</button>
+        <span style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--bd3);text-transform:uppercase">BLE LOG</span>
+        <button onclick="clearCon()" style="font-size:9px;color:var(--bd4);border:1px solid var(--bg-btn2);padding:1px 7px;border-radius:3px;background:none;cursor:pointer">CLR</button>
       </div>
-      <div id="conPanel" style="background:#07080d;border:1px solid #181818;border-radius:7px;padding:6px 10px;height:100px;overflow-y:auto;font-family:monospace;font-size:9.5px;line-height:1.75;color:#22c55e"></div>
+      <div id="conPanel" style="background:#07080d;border:1px solid var(--bd1);border-radius:7px;padding:6px 10px;height:100px;overflow-y:auto;font-family:monospace;font-size:9.5px;line-height:1.75;color:#22c55e"></div>
     </div>
     <div style="height:72px"></div>
   </div>
@@ -257,15 +292,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     <div id="mapBg"></div>
     <div id="mapNodes" style="position:absolute;inset:0"></div>
     <div id="mapEmpty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none">
-      <i class="fa-solid fa-map-location-dot" style="font-size:52px;color:#181818;margin-bottom:14px"></i>
-      <div style="font-size:14px;font-weight:700;color:#252525">기기를 페어링하면<br>2D 맵에 표시됩니다</div>
+      <i class="fa-solid fa-map-location-dot" style="font-size:52px;color:var(--bd1);margin-bottom:14px"></i>
+      <div style="font-size:14px;font-weight:700;color:var(--bd3)">기기를 페어링하면<br>2D 맵에 표시됩니다</div>
     </div>
   </div>
 
 </div>
 
 <!-- BOTTOM NAV -->
-<div style="flex-shrink:0;background:#0f0f0f;border-top:1px solid #181818;display:flex;height:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px)">
+<div style="flex-shrink:0;background:var(--bg-panel);border-top:1px solid var(--bd1);display:flex;height:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px)">
   <button class="bnav-btn on" id="bnav-home" onclick="navTo('home')">
     <span style="font-size:19px"><i class="fa-solid fa-list-ul"></i></span>
     <span>DEVICES</span>
@@ -277,30 +312,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 </div>
 
 <!-- GROUP PANEL -->
-<div id="groupPanel" style="display:none;position:fixed;bottom:72px;right:14px;z-index:600;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.85)">
+<div id="groupPanel" style="display:none;position:fixed;bottom:72px;right:14px;z-index:600;background:var(--bd1);border:1px solid var(--bd3);border-radius:10px;padding:14px;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.85)">
   <button onclick="hideGroupPanel()" style="position:absolute;top:10px;right:10px;color:#444;background:none;border:none;cursor:pointer"><i class="fa-solid fa-xmark"></i></button>
   <div style="font-size:11px;font-weight:800;color:#fff;margin-bottom:10px;letter-spacing:.04em">그룹 만들기</div>
   <div id="groupDevSelect" style="max-height:160px;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:5px"></div>
   <div style="display:flex;gap:6px">
-    <input id="groupNameIn" type="text" placeholder="Group name..." style="flex:1;background:#111;border:1px solid #2a2a2a;border-radius:5px;padding:6px 8px;font-size:11px;color:#dde0ec;outline:none"/>
+    <input id="groupNameIn" type="text" placeholder="Group name..." style="flex:1;background:var(--bg-sunken);border:1px solid var(--bd3);border-radius:5px;padding:6px 8px;font-size:11px;color:var(--tx1);outline:none"/>
     <button onclick="createGroup()" style="padding:0 12px;background:#ff6b00;color:#000;border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer">OK</button>
   </div>
 </div>
 
 <!-- PAIR MODAL -->
 <div id="pairModal" class="modal-bg" style="padding:30px 14px 60px">
-  <div style="max-width:380px;margin:0 auto;background:#161616;border:1px solid #252525;border-radius:14px;padding:18px">
+  <div style="max-width:380px;margin:0 auto;background:var(--bg-card);border:1px solid var(--bd3);border-radius:14px;padding:18px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <span style="font-size:15px;font-weight:800">장비 페어링</span>
       <button onclick="closePairModal()" style="color:#444;background:none;border:none;cursor:pointer;font-size:16px"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div style="background:#0f0f0f;border:1px solid #1e1e1e;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:#666;line-height:1.75">
+    <div style="background:var(--bg-panel);border:1px solid var(--bg-btn2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:#666;line-height:1.75">
       <strong style="color:#00e5ff">지원 브랜드:</strong> Godox · Aputure/Amaran · Nanlite/Nanlink<br>
       <strong style="color:#ffd700">iOS:</strong> Safari 미지원 — Bluefy 앱 필요
     </div>
     <div id="iosLinkBox" style="display:none;margin-bottom:10px">
-      <a href="https://apps.apple.com/us/app/bluefy-web-ble-browser/id1492822055" target="_blank" style="display:flex;align-items:center;justify-content:center;width:100%;padding:10px;border:1px solid #2a2a2a;border-radius:8px;color:#dde0ec;font-size:12px;font-weight:700;text-decoration:none;margin-bottom:6px"><i class="fa-brands fa-apple" style="margin-right:6px"></i>Bluefy App Store</a>
-      <div style="background:#111;border:1px solid #1e1e1e;border-radius:4px;padding:5px 8px;font-size:10px;color:#444">URL: <span id="currentUrl" style="color:#00e5ff;word-break:break-all"></span></div>
+      <a href="https://apps.apple.com/us/app/bluefy-web-ble-browser/id1492822055" target="_blank" style="display:flex;align-items:center;justify-content:center;width:100%;padding:10px;border:1px solid var(--bd3);border-radius:8px;color:var(--tx1);font-size:12px;font-weight:700;text-decoration:none;margin-bottom:6px"><i class="fa-brands fa-apple" style="margin-right:6px"></i>Bluefy App Store</a>
+      <div style="background:var(--bg-sunken);border:1px solid var(--bg-btn2);border-radius:4px;padding:5px 8px;font-size:10px;color:#444">URL: <span id="currentUrl" style="color:#00e5ff;word-break:break-all"></span></div>
     </div>
     <button id="pairStartBtn" onclick="doPair()" style="width:100%;padding:14px;border-radius:10px;background:#ff6b00;color:#000;font-size:14px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
       <i class="fa-brands fa-bluetooth"></i>BLE 스캔 시작
@@ -310,31 +345,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 <!-- MASTER MODAL -->
 <div id="masterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;display:none;align-items:flex-end;justify-content:center">
-  <div style="background:#141414;border:1px solid #252525;border-top-left-radius:18px;border-top-right-radius:18px;width:100%;max-width:500px;padding:20px 18px 32px;max-height:90vh;overflow-y:auto">
-    <div style="width:40px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 16px"></div>
+  <div style="background:var(--bg-btn);border:1px solid var(--bd3);border-top-left-radius:18px;border-top-right-radius:18px;width:100%;max-width:500px;padding:20px 18px 32px;max-height:90vh;overflow-y:auto">
+    <div style="width:40px;height:4px;background:var(--bd3);border-radius:2px;margin:0 auto 16px"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <span style="font-size:15px;font-weight:800;color:#ff6b00"><i class="fa-solid fa-bolt" style="margin-right:6px"></i>MASTER CONTROL</span>
       <button onclick="hideMasterModal()" style="color:#444;background:none;border:none;cursor:pointer;font-size:16px"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div style="background:#1a1a1a;border:1px solid #242424;border-radius:8px;padding:14px;margin-bottom:10px">
+    <div style="background:var(--bd1);border:1px solid var(--bd2);border-radius:8px;padding:14px;margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <span style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#444;text-transform:uppercase">MASTER DIMMER</span>
         <div style="display:flex;align-items:center;gap:8px">
-          <span id="mBrHex" style="font-size:10px;font-family:monospace;color:#333;background:#111;border:1px solid #1e1e1e;padding:2px 7px;border-radius:3px">0xFF</span>
+          <span id="mBrHex" style="font-size:10px;font-family:monospace;color:var(--bd4);background:var(--bg-sunken);border:1px solid var(--bg-btn2);padding:2px 7px;border-radius:3px">0xFF</span>
           <span id="mBrBadge" style="font-size:20px;font-weight:900;font-family:monospace;color:#ff6b00">100%</span>
         </div>
       </div>
       <input type="range" id="mBr" class="sl-br" min="0" max="100" value="100" oninput="onMBr(this.value)"/>
       <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:9px;color:#282828;font-family:monospace"><span>0x00</span><span>0x40</span><span>0x80</span><span>0xFF</span></div>
       <div style="display:flex;gap:5px;margin-top:10px">
-        <button onclick="quickBr(0)"   style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #252525;background:#111;color:#444;cursor:pointer">0%</button>
-        <button onclick="quickBr(25)"  style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #252525;background:#111;color:#444;cursor:pointer">25%</button>
-        <button onclick="quickBr(50)"  style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #252525;background:#111;color:#444;cursor:pointer">50%</button>
-        <button onclick="quickBr(75)"  style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #252525;background:#111;color:#444;cursor:pointer">75%</button>
+        <button onclick="quickBr(0)"   style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid var(--bd3);background:var(--bg-sunken);color:#444;cursor:pointer">0%</button>
+        <button onclick="quickBr(25)"  style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid var(--bd3);background:var(--bg-sunken);color:#444;cursor:pointer">25%</button>
+        <button onclick="quickBr(50)"  style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid var(--bd3);background:var(--bg-sunken);color:#444;cursor:pointer">50%</button>
+        <button onclick="quickBr(75)"  style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:700;border:1px solid var(--bd3);background:var(--bg-sunken);color:#444;cursor:pointer">75%</button>
         <button onclick="quickBr(100)" style="flex:1;padding:7px 0;border-radius:4px;font-size:11px;font-weight:800;background:#ff6b00;color:#000;border:none;cursor:pointer">100%</button>
       </div>
     </div>
-    <div style="background:#1a1a1a;border:1px solid #242424;border-radius:8px;padding:14px;margin-bottom:10px">
+    <div style="background:var(--bd1);border:1px solid var(--bd2);border-radius:8px;padding:14px;margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;margin-bottom:10px">
         <span style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#444;text-transform:uppercase">MASTER CCT</span>
         <span id="mCctV" style="font-size:14px;font-weight:800;font-family:monospace;color:#93c5fd">5600K</span>
@@ -343,9 +378,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     </div>
     <div style="display:flex;gap:8px;margin-bottom:12px">
       <button onclick="masterOff()" style="flex:1;padding:10px 0;border-radius:6px;font-size:12px;font-weight:700;border:1px solid rgba(255,59,48,.3);color:#ff3b30;background:transparent;cursor:pointer"><i class="fa-solid fa-power-off" style="margin-right:5px"></i>ALL OFF</button>
-      <button onclick="masterSync()" style="flex:1;padding:10px 0;border-radius:6px;font-size:12px;font-weight:700;border:1px solid #252525;color:#555;background:transparent;cursor:pointer"><i class="fa-solid fa-arrows-rotate" style="margin-right:5px"></i>SYNC ALL</button>
+      <button onclick="masterSync()" style="flex:1;padding:10px 0;border-radius:6px;font-size:12px;font-weight:700;border:1px solid var(--bd3);color:#555;background:transparent;cursor:pointer"><i class="fa-solid fa-arrows-rotate" style="margin-right:5px"></i>SYNC ALL</button>
     </div>
-    <div style="background:#1a1a1a;border:1px solid #242424;border-radius:8px;padding:14px">
+    <div style="background:var(--bd1);border:1px solid var(--bd2);border-radius:8px;padding:14px">
       <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#ffd700;text-transform:uppercase;margin-bottom:12px"><i class="fa-solid fa-bolt" style="margin-right:5px"></i>LIGHTNING ENGINE</div>
       <div style="display:flex;gap:5px;margin-bottom:8px">
         <button onclick="lxMode('m','tap')"  id="mm_tap"    class="lx-btn on">TAP</button>
@@ -374,7 +409,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 <!-- SPEC MODAL -->
 <div id="specModal" class="modal-bg" style="padding:24px 14px 60px">
-  <div style="max-width:480px;margin:0 auto;background:#161616;border:1px solid #252525;border-radius:12px;padding:18px">
+  <div style="max-width:480px;margin:0 auto;background:var(--bg-card);border:1px solid var(--bd3);border-radius:12px;padding:18px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <span style="font-size:14px;font-weight:800">Protocol Spec</span>
       <button onclick="document.getElementById('specModal').style.display='none'" style="color:#444;background:none;border:none;cursor:pointer;font-size:16px"><i class="fa-solid fa-xmark"></i></button>
@@ -385,8 +420,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 <!-- MAP CONTROL SHEET -->
 <div id="mapCtrlSheet" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:900;align-items:flex-end;justify-content:center">
-  <div id="mapCtrlContent" style="background:#141414;border:1px solid #252525;border-top-left-radius:16px;border-top-right-radius:16px;width:100%;max-width:480px;padding:16px 16px 32px;max-height:80vh;overflow-y:auto">
-    <div style="width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 14px"></div>
+  <div id="mapCtrlContent" style="background:var(--bg-btn);border:1px solid var(--bd3);border-top-left-radius:16px;border-top-right-radius:16px;width:100%;max-width:480px;padding:16px 16px 32px;max-height:80vh;overflow-y:auto">
+    <div style="width:36px;height:4px;background:var(--bd3);border-radius:2px;margin:0 auto 14px"></div>
   </div>
 </div>
 
@@ -414,7 +449,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
     <!-- 검색 결과 -->
     <div class="supp-results" id="suppResults">
-      <div class="supp-empty"><i class="fa-solid fa-magnifying-glass" style="font-size:22px;color:#1e1e1e;display:block;margin-bottom:8px"></i>브랜드를 선택하고 제품명을 입력하세요</div>
+      <div class="supp-empty"><i class="fa-solid fa-magnifying-glass" style="font-size:22px;color:var(--bg-btn2);display:block;margin-bottom:8px"></i>브랜드를 선택하고 제품명을 입력하세요</div>
     </div>
 
     <!-- 직접 입력 섹션 -->
@@ -426,7 +461,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         <input id="m_cctMin" type="number" placeholder="최저 색온도 K (예: 2700)">
         <input id="m_cctMax" type="number" placeholder="최고 색온도 K (예: 6500)">
       </div>
-      <div style="font-size:9px;color:#333;font-weight:700;letter-spacing:.08em;margin-bottom:6px">지원 기능</div>
+      <div style="font-size:9px;color:var(--bd4);font-weight:700;letter-spacing:.08em;margin-bottom:6px">지원 기능</div>
       <div class="supp-feat-row">
         <div class="supp-feat-chk on" id="fc_cct" onclick="toggleFeat('cct')">CCT</div>
         <div class="supp-feat-chk" id="fc_rgb" onclick="toggleFeat('rgb')">RGB</div>
@@ -435,7 +470,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       <button class="supp-save-btn" onclick="saveManualProfile()"><i class="fa-solid fa-floppy-disk" style="margin-right:6px"></i>커스텀 프로파일 저장</button>
     </div>
 
-    <div style="margin-top:12px;font-size:10px;color:#252525;text-align:center">
+    <div style="margin-top:12px;font-size:10px;color:var(--bd3);text-align:center">
       저장된 프로파일은 BLE 스캔 시 자동으로 적용됩니다
     </div>
   </div>
@@ -506,7 +541,7 @@ function colorPreviewCSS(d){
   if(t<=2800)return'#ff7400';if(t<=3200)return'#ff9944';if(t<=4000)return'#ffcc88';if(t<=5600)return'#fff9ee';if(t<=7000)return'#d4e8ff';return'#a8ceff';
 }
 function batIcon(pct){if(pct==null)return'empty';if(pct>=75)return'full';if(pct>=50)return'three-quarters';if(pct>=25)return'half';return'quarter';}
-function batColor(pct){if(pct==null)return'#333';if(pct>=50)return'#00e676';if(pct>=25)return'#ffd700';return'#ff3b30';}
+function batColor(pct){if(pct==null)return'var(--bd4)';if(pct>=50)return'#00e676';if(pct>=25)return'#ffd700';return'#ff3b30';}
 
 const _throttle={};
 function throttleOK(id,gap=40){const n=Date.now();if(n-(_throttle[id]||0)<gap)return false;_throttle[id]=n;return true;}
@@ -536,8 +571,8 @@ function setView(v){
   document.getElementById('view-list').style.display=v==='list'?'block':'none';
   document.getElementById('view-map').style.display=v==='map'?'block':'none';
   const lb=document.getElementById('vbtnList'),mb=document.getElementById('vbtnMap');
-  if(lb){lb.style.background=v==='list'?'#1e1e1e':'#141414';lb.style.borderColor=v==='list'?'#333':'#222';lb.style.color=v==='list'?'#ff6b00':'#444';}
-  if(mb){mb.style.background=v==='map'?'#1e1e1e':'#141414';mb.style.borderColor=v==='map'?'#333':'#222';mb.style.color=v==='map'?'#ff6b00':'#444';}
+  if(lb){lb.style.background=v==='list'?'var(--bg-btn2)':'var(--bg-btn)';lb.style.borderColor=v==='list'?'var(--bd4)':'var(--bd2)';lb.style.color=v==='list'?'#ff6b00':'#444';}
+  if(mb){mb.style.background=v==='map'?'var(--bg-btn2)':'var(--bg-btn)';mb.style.borderColor=v==='map'?'var(--bd4)':'var(--bd2)';mb.style.color=v==='map'?'#ff6b00':'#444';}
   if(v==='map')renderMapNodes();
 }
 function setTab(t){
@@ -660,13 +695,88 @@ function onDSat(id,val){DEV[id].s=+val;const e=document.getElementById('dSatV_'+
 function onDLum(id,val){DEV[id].lum=+val;const e=document.getElementById('dLumV_'+id);if(e)e.textContent=val+'%';const d=DEV[id];dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();}
 function onDFX(id,fxId){DEV[id].fxId=fxId;writeNow(id,pktFX(DEV[id].brand,fxId,DEV[id].fxSpeed));DEV[id].dirty=true;savePersist();rebuildTab(id);}
 function onDFXSpeed(id,val){DEV[id].fxSpeed=+val;const e=document.getElementById('dFxSV_'+id);if(e)e.textContent=val+'%';if(DEV[id].fxId>0)dbSend(id,pktFX(DEV[id].brand,DEV[id].fxId,+val));savePersist();}
+
+// ===== EFFECT PAGE (효과 페이지) =====
+// 효과 종류별 노출 컨트롤 정의. dim/speed는 공통, 나머지는 효과 특성에 따라.
+function efxParams(lb){lb=lb||'';
+  if(/색상|hue/i.test(lb))return{hue:1,sat:1,cycle:1,addon:1};   // 색상 루프
+  if(/색온|cct/i.test(lb))return{cct:1,cycle:1,addon:1};          // 색온도 루프
+  if(/밝기|int/i.test(lb))return{cycle:1,addon:1};                // 밝기 루프
+  if(/플래시|flash|펄스|pulse/i.test(lb))return{hue:1,sat:1};     // 단색 플래시/펄스 → 색 지정
+  return{addon:1};                                                // 그 외 앰비언스 효과(불꽃·폭풍·TV 등)
+}
+function efxInit(d,cfg){
+  const fxs=cfg.fx;
+  if(!fxs.some(f=>f.id===d.fxId))d.fxId=fxs.length?fxs[0].id:0;
+  if(d.efxDim==null)d.efxDim=d.br!=null?d.br:100;
+  if(d.efxHue==null)d.efxHue=0;
+  if(d.efxSat==null)d.efxSat=100;
+  if(d.efxCct==null)d.efxCct=Math.round((cfg.cctMin+cfg.cctMax)/2);
+  if(d.efxCycle==null)d.efxCycle='two';
+  if(d.efxAddon==null)d.efxAddon='off';
+}
+function buildEfxHTML(id){
+  const d=DEV[id],cfg=FDB[d.brand];efxInit(d,cfg);
+  const fxs=cfg.fx,q="'"+id+"'";
+  const cur=fxs.find(f=>f.id===d.fxId)||{icon:'fa-wand-magic-sparkles',label:'NONE'};
+  const P=efxParams(cur.label);
+  const hd=(t,vid,vtxt)=>'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-faint);text-transform:uppercase">'+t+'</span><span id="'+vid+'_'+id+'" style="font-size:11px;font-weight:700;font-family:monospace;color:#ff6b00">'+vtxt+'</span></div>';
+  let h='<div>';
+  // 효과 선택기 (좌우 화살표 + 이름)
+  h+='<div class="efx-sel">'+
+     '<button class="efx-arw" onclick="efxStep('+q+',-1)"><i class="fa-solid fa-chevron-left"></i></button>'+
+     '<div class="efx-name"><i class="fa-solid '+cur.icon+'" style="margin-right:6px"></i>'+cur.label+'</div>'+
+     '<button class="efx-arw" onclick="efxStep('+q+',1)"><i class="fa-solid fa-chevron-right"></i></button>'+
+     '</div>';
+  // DIM (공통)
+  h+='<div style="margin-top:14px">'+hd('DIM','efxDimV',d.efxDim+'%')+'<input type="range" class="sl-br" min="0" max="100" value="'+d.efxDim+'" oninput="onEfxDim('+q+',this.value)"/></div>';
+  if(P.hue&&P.sat){
+    // 효과용 컬러휠 (Sidus Link 참고) — efxHue/efxSat 제어
+    h+='<div style="margin-top:14px"><div class="efx-grp-lbl" style="margin-top:0">COLOR</div>'+
+       '<div class="wheel-wrap" style="width:152px;height:152px;margin:2px auto 8px"><canvas id="ewhl_'+id+'" class="whl" width="152" height="152" style="width:152px;height:152px"></canvas><div id="ewhlC_'+id+'" class="whl-cross"></div></div>'+
+       '<div style="display:flex;justify-content:center;gap:14px;font-size:10px;font-family:monospace;color:#888">H:<span id="efxHueV_'+id+'" style="color:#ff6b00;font-weight:700">'+d.efxHue+'°</span> S:<span id="efxSatV_'+id+'" style="color:#ff6b00;font-weight:700">'+d.efxSat+'%</span></div>'+
+       '</div>';
+  }else{
+    if(P.hue)h+='<div style="margin-top:12px">'+hd('HUE','efxHueV',d.efxHue+'°')+'<input type="range" class="sl-hue" min="0" max="360" value="'+d.efxHue+'" oninput="onEfxHue('+q+',this.value)"/></div>';
+    if(P.sat)h+='<div style="margin-top:12px">'+hd('SAT','efxSatV',d.efxSat+'%')+'<input type="range" class="sl-sat" min="0" max="100" value="'+d.efxSat+'" oninput="onEfxSat('+q+',this.value)" style="background:linear-gradient(to right,#808080,hsl('+d.efxHue+',100%,50%))"/></div>';
+  }
+  if(P.cct)h+='<div style="margin-top:12px">'+hd('CCT','efxCctV',d.efxCct+'K')+'<input type="range" class="sl-cct" min="'+cfg.cctMin+'" max="'+cfg.cctMax+'" value="'+d.efxCct+'" oninput="onEfxCct('+q+',this.value)"/></div>';
+  // SPEED (공통)
+  h+='<div style="margin-top:12px">'+hd('SPEED','efxSpdV',d.fxSpeed+'%')+'<input type="range" class="sl-br" min="1" max="100" value="'+d.fxSpeed+'" oninput="onEfxSpeed('+q+',this.value)"/></div>';
+  if(P.cycle)h+='<div class="efx-grp-lbl">CYCLE</div><div class="efx-seg">'+
+     '<button id="efxcy_one_'+id+'" class="efx-sb'+(d.efxCycle==='one'?' on':'')+'" onclick="efxCycle('+q+',\'one\')">ONE-WAY</button>'+
+     '<button id="efxcy_two_'+id+'" class="efx-sb'+(d.efxCycle==='two'?' on':'')+'" onclick="efxCycle('+q+',\'two\')">TWO-WAY</button>'+
+     '<button id="efxcy_reverse_'+id+'" class="efx-sb'+(d.efxCycle==='reverse'?' on':'')+'" onclick="efxCycle('+q+',\'reverse\')">REVERSE</button>'+
+     '</div>';
+  if(P.addon)h+='<div class="efx-grp-lbl">ADD-ON</div><div class="efx-seg">'+
+     '<button id="efxad_off_'+id+'" class="efx-sb'+(d.efxAddon==='off'?' on':'')+'" onclick="efxAddon('+q+',\'off\')">OFF</button>'+
+     '<button id="efxad_flash_'+id+'" class="efx-sb'+(d.efxAddon==='flash'?' on':'')+'" onclick="efxAddon('+q+',\'flash\')">FLASH</button>'+
+     '<button id="efxad_rflash_'+id+'" class="efx-sb'+(d.efxAddon==='rflash'?' on':'')+'" onclick="efxAddon('+q+',\'rflash\')">RANDOM</button>'+
+     '<button id="efxad_pulse_'+id+'" class="efx-sb'+(d.efxAddon==='pulse'?' on':'')+'" onclick="efxAddon('+q+',\'pulse\')">PULSE</button>'+
+     '</div>';
+  // SCENE 프리셋 (Sidus Link 참고) — 효과+색+속도 조합 저장/적용
+  const _sc=efxScenes();
+  h+='<div class="efx-grp-lbl" style="display:flex;justify-content:space-between;align-items:center"><span>SCENE 프리셋</span><button class="efx-save" onclick="efxSaveScene('+q+')"><i class="fa-solid fa-bookmark" style="margin-right:4px"></i>현재 저장</button></div>';
+  if(_sc.length)h+='<div class="efx-scenes">'+_sc.map(s=>'<div class="efx-chip" onclick="efxApplyScene('+q+',\''+s.name+'\')"><i class="fa-solid fa-layer-group" style="color:#5fd07f"></i>'+s.name+'<i class="fa-solid fa-xmark" onclick="event.stopPropagation();efxDeleteScene('+q+',\''+s.name+'\')"></i></div>').join('')+'</div>';
+  else h+='<div style="font-size:10px;color:var(--bd4);padding:2px 0 4px">저장된 씬이 없습니다 — 현재 설정을 저장해보세요.</div>';
+  h+='</div>';return h;
+}
+function sendEfx(id){const d=DEV[id];if(!d||!d.connected)return;if(d.fxId>0)writeNow(id,pktFX(d.brand,d.fxId,d.fxSpeed));}
+function efxStep(id,dir){const d=DEV[id],fxs=FDB[d.brand].fx;if(!fxs.length)return;let i=fxs.findIndex(f=>f.id===d.fxId);if(i<0)i=0;i=(i+dir+fxs.length)%fxs.length;d.fxId=fxs[i].id;sendEfx(id);d.dirty=true;savePersist();rebuildTab(id);}
+function onEfxDim(id,v){const d=DEV[id];d.efxDim=+v;const e=document.getElementById('efxDimV_'+id);if(e)e.textContent=v+'%';dbSend(id,pktBr(d.brand,+v));d.dirty=true;savePersist();}
+function onEfxHue(id,v){const d=DEV[id];d.efxHue=+v;const e=document.getElementById('efxHueV_'+id);if(e)e.textContent=v+'°';const s=document.getElementById('efxSatV_'+id);if(s){const sl=s.parentElement.nextElementSibling;if(sl&&sl.tagName==='INPUT')sl.style.background='linear-gradient(to right,#808080,hsl('+v+',100%,50%))';}sendEfx(id);savePersist();}
+function onEfxSat(id,v){const d=DEV[id];d.efxSat=+v;const e=document.getElementById('efxSatV_'+id);if(e)e.textContent=v+'%';sendEfx(id);savePersist();}
+function onEfxCct(id,v){const d=DEV[id];d.efxCct=+v;const e=document.getElementById('efxCctV_'+id);if(e)e.textContent=v+'K';sendEfx(id);savePersist();}
+function onEfxSpeed(id,v){const d=DEV[id];d.fxSpeed=+v;const e=document.getElementById('efxSpdV_'+id);if(e)e.textContent=v+'%';if(d.fxId>0)dbSend(id,pktFX(d.brand,d.fxId,+v));savePersist();}
+function efxCycle(id,c){DEV[id].efxCycle=c;['one','two','reverse'].forEach(x=>{const el=document.getElementById('efxcy_'+x+'_'+id);if(el)el.classList.toggle('on',x===c);});sendEfx(id);DEV[id].dirty=true;savePersist();}
+function efxAddon(id,a){DEV[id].efxAddon=a;['off','flash','rflash','pulse'].forEach(x=>{const el=document.getElementById('efxad_'+x+'_'+id);if(el)el.classList.toggle('on',x===a);});sendEfx(id);DEV[id].dirty=true;savePersist();}
 function onDHue(id,val){
   DEV[id].h=+val;const e=document.getElementById('dHueV_'+id);if(e)e.textContent=val+'°';
   const sat=document.getElementById('dSat_'+id);if(sat)sat.style.background='linear-gradient(to right,#808080,hsl('+val+',100%,50%))';
   updateWheelCrosshair(id);const d=DEV[id];dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();
 }
-function switchDTab(id,t){DEV[id].tab=t;rebuildTab(id);['cct','hsi','fx','lx'].forEach(tab=>{const el=document.getElementById('dtab_'+tab+'_'+id);if(el)el.classList.toggle('on',tab===t);});if(t==='hsi')setTimeout(()=>{initWheel(id);updateWheelCrosshair(id);},60);}
-function rebuildTab(id){const el=document.getElementById('dtc_'+id);if(el)el.innerHTML=buildTabHTML(id);if(DEV[id].tab==='hsi')setTimeout(()=>initWheel(id),60);}
+function switchDTab(id,t){DEV[id].tab=t;rebuildTab(id);['cct','hsi','fx','lx'].forEach(tab=>{const el=document.getElementById('dtab_'+tab+'_'+id);if(el)el.classList.toggle('on',tab===t);});if(t==='hsi')setTimeout(()=>{initWheel(id);updateWheelCrosshair(id);},60);else if(t==='fx')setTimeout(()=>{initEfxWheel(id);updateEfxCross(id);},60);}
+function rebuildTab(id){const el=document.getElementById('dtc_'+id);if(el)el.innerHTML=buildTabHTML(id);const t=DEV[id].tab;if(t==='hsi')setTimeout(()=>initWheel(id),60);else if(t==='fx')setTimeout(()=>initEfxWheel(id),60);}
 function updateColorDot(id){const dot=document.getElementById('cdot_'+id);if(!dot)return;const color=colorPreviewCSS(DEV[id]);dot.style.background=color;dot.style.boxShadow='0 0 5px '+color;if(_curView==='map')updateMapNode(id);}
 
 function drawColorWheel(canvas){
@@ -711,12 +821,64 @@ function updateWheelCrosshair(id){
   cross.style.left=(x*scX)+'px';cross.style.top=(y*scY)+'px';cross.style.background='hsl('+d.h+','+d.s+'%,50%)';
 }
 
+// ===== 효과용 컬러휠 (drawColorWheel 재사용, efxHue/efxSat 제어) =====
+function initEfxWheel(id){
+  const canvas=document.getElementById('ewhl_'+id);if(!canvas||canvas.dataset.drawn)return;
+  drawColorWheel(canvas);canvas.dataset.drawn='1';
+  function ev(e){e.preventDefault();const t=e.touches?e.touches[0]:e;efxWheelPick(id,t.clientX,t.clientY);}
+  canvas.addEventListener('touchstart',ev,{passive:false});
+  canvas.addEventListener('touchmove',ev,{passive:false});
+  canvas.addEventListener('mousedown',ev);
+  canvas.addEventListener('mousemove',e=>{if(e.buttons===1)ev(e);});
+  updateEfxCross(id);
+}
+function efxWheelPick(id,cx,cy){
+  const canvas=document.getElementById('ewhl_'+id);if(!canvas)return;
+  const rect=canvas.getBoundingClientRect();const scX=canvas.width/rect.width,scY=canvas.height/rect.height;
+  const px=(cx-rect.left)*scX,py=(cy-rect.top)*scY;const wcx=canvas.width/2,wcy=canvas.height/2,r=Math.min(wcx,wcy)-1;
+  const dx=px-wcx,dy=py-wcy,dist=Math.sqrt(dx*dx+dy*dy);if(dist>r)return;
+  const angle=((Math.atan2(dy,dx)*180/Math.PI)+90+360)%360;const sat=Math.min(100,Math.round((dist/r)*100));
+  const d=DEV[id];d.efxHue=Math.round(angle);d.efxSat=sat;
+  const hv=document.getElementById('efxHueV_'+id),sv=document.getElementById('efxSatV_'+id);
+  if(hv)hv.textContent=d.efxHue+'°';if(sv)sv.textContent=d.efxSat+'%';
+  updateEfxCross(id);sendEfx(id);d.dirty=true;savePersist();
+}
+function updateEfxCross(id){
+  const d=DEV[id],canvas=document.getElementById('ewhl_'+id),cross=document.getElementById('ewhlC_'+id);
+  if(!canvas||!cross||!d)return;
+  const cx=canvas.width/2,cy=canvas.height/2,r=Math.min(cx,cy)-1;
+  const angle=(d.efxHue-90)*Math.PI/180,radius=((d.efxSat||0)/100)*r;const x=cx+radius*Math.cos(angle),y=cy+radius*Math.sin(angle);
+  const rect=canvas.getBoundingClientRect(),scX=rect.width/canvas.width,scY=rect.height/canvas.height;
+  cross.style.left=(x*scX)+'px';cross.style.top=(y*scY)+'px';cross.style.background='hsl('+d.efxHue+','+(d.efxSat||0)+'%,50%)';
+}
+// ===== SCENE 프리셋 (효과 조합 저장/적용/삭제) =====
+function efxScenes(){try{return JSON.parse(localStorage.getItem('lb_efxScenes')||'[]');}catch(e){return[];}}
+function efxScenesSave(list){try{localStorage.setItem('lb_efxScenes',JSON.stringify(list));}catch(e){console.warn('[scene save]',e.message);}}
+function efxSaveScene(id){
+  const d=DEV[id],cfg=FDB[d.brand];const cur=cfg.fx.find(f=>f.id===d.fxId);
+  let name=prompt('씬 이름을 입력하세요','효과 '+(efxScenes().length+1));
+  if(name==null)return;name=name.replace(/['"\\<>&]/g,'').trim();if(!name){toast('이름이 비어 있습니다');return;}
+  const list=efxScenes().filter(s=>s.name!==name);
+  list.push({name:name,label:cur?cur.label:'',fxId:d.fxId,efxDim:d.efxDim,efxHue:d.efxHue,efxSat:d.efxSat,efxCct:d.efxCct,fxSpeed:d.fxSpeed,efxCycle:d.efxCycle,efxAddon:d.efxAddon});
+  efxScenesSave(list);toast('씬 저장: '+name);rebuildTab(id);
+}
+function efxApplyScene(id,name){
+  const s=efxScenes().find(x=>x.name===name);if(!s)return;const d=DEV[id],cfg=FDB[d.brand];
+  d.efxDim=s.efxDim;d.efxHue=s.efxHue;d.efxSat=s.efxSat;d.efxCct=s.efxCct;d.fxSpeed=s.fxSpeed;d.efxCycle=s.efxCycle;d.efxAddon=s.efxAddon;
+  const m=cfg.fx.find(f=>f.label===s.label);if(m)d.fxId=m.id;
+  sendEfx(id);d.dirty=true;savePersist();rebuildTab(id);toast('씬 적용: '+name);
+}
+function efxDeleteScene(id,name){
+  if(!confirm('"'+name+'" 씬을 삭제할까요?'))return;
+  efxScenesSave(efxScenes().filter(s=>s.name!==name));rebuildTab(id);toast('씬 삭제: '+name);
+}
+
 function buildTabHTML(id){
   const d=DEV[id],cfg=FDB[d.brand],t=d.tab;
   if(t==='cct'){return '<div>'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:#3a3a3a;text-transform:uppercase">COLOR TEMP</span><span id="dCctV_'+id+'" style="font-size:13px;font-weight:900;font-family:monospace;color:#93c5fd">'+d.cct+'K</span></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-faint);text-transform:uppercase">COLOR TEMP</span><span id="dCctV_'+id+'" style="font-size:13px;font-weight:900;font-family:monospace;color:#93c5fd">'+d.cct+'K</span></div>'+
     '<input type="range" id="dCct_'+id+'" class="sl-cct" min="'+cfg.cctMin+'" max="'+cfg.cctMax+'" value="'+d.cct+'" oninput="onDCct(\''+id+'\',this.value)" style="margin-bottom:14px"/>'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:#3a3a3a;text-transform:uppercase">BRIGHTNESS</span><span id="dBrV_'+id+'" style="font-size:13px;font-weight:900;font-family:monospace;color:#ff6b00">'+d.br+'%</span></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-faint);text-transform:uppercase">BRIGHTNESS</span><span id="dBrV_'+id+'" style="font-size:13px;font-weight:900;font-family:monospace;color:#ff6b00">'+d.br+'%</span></div>'+
     '<input type="range" id="dBr_'+id+'" class="sl-br" min="0" max="100" value="'+d.br+'" oninput="onDBr(\''+id+'\',this.value)"/>'+
     '</div>';}
   if(t==='hsi'){return '<div>'+
@@ -724,15 +886,11 @@ function buildTabHTML(id){
       '<canvas id="whl_'+id+'" class="whl" width="160" height="160" style="width:160px;height:160px"></canvas>'+
       '<div id="whlC_'+id+'" class="whl-cross"></div></div>'+
     '<div style="display:flex;flex-direction:column;gap:10px">'+
-      '<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:#3a3a3a;text-transform:uppercase">HUE</span><span id="dHueV_'+id+'" style="font-size:11px;font-weight:700;font-family:monospace;color:#ccc">'+d.h+'°</span></div><input type="range" id="dHue_'+id+'" class="sl-hue" min="0" max="360" value="'+d.h+'" oninput="onDHue(\''+id+'\',this.value)"/></div>'+
-      '<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:#3a3a3a;text-transform:uppercase">SAT</span><span id="dSatV_'+id+'" style="font-size:11px;font-weight:700;font-family:monospace;color:#ccc">'+d.s+'%</span></div><input type="range" id="dSat_'+id+'" class="sl-sat" min="0" max="100" value="'+d.s+'" oninput="onDSat(\''+id+'\',this.value)" style="background:linear-gradient(to right,#808080,hsl('+d.h+',100%,50%))"/></div>'+
-      '<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:#3a3a3a;text-transform:uppercase">INTENSITY</span><span id="dLumV_'+id+'" style="font-size:11px;font-weight:700;font-family:monospace;color:#ccc">'+d.lum+'%</span></div><input type="range" id="dLum_'+id+'" class="sl-int" min="0" max="100" value="'+d.lum+'" oninput="onDLum(\''+id+'\',this.value)"/></div>'+
+      '<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-faint);text-transform:uppercase">HUE</span><span id="dHueV_'+id+'" style="font-size:11px;font-weight:700;font-family:monospace;color:var(--tx-soft)">'+d.h+'°</span></div><input type="range" id="dHue_'+id+'" class="sl-hue" min="0" max="360" value="'+d.h+'" oninput="onDHue(\''+id+'\',this.value)"/></div>'+
+      '<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-faint);text-transform:uppercase">SAT</span><span id="dSatV_'+id+'" style="font-size:11px;font-weight:700;font-family:monospace;color:var(--tx-soft)">'+d.s+'%</span></div><input type="range" id="dSat_'+id+'" class="sl-sat" min="0" max="100" value="'+d.s+'" oninput="onDSat(\''+id+'\',this.value)" style="background:linear-gradient(to right,#808080,hsl('+d.h+',100%,50%))"/></div>'+
+      '<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--tx-faint);text-transform:uppercase">INTENSITY</span><span id="dLumV_'+id+'" style="font-size:11px;font-weight:700;font-family:monospace;color:var(--tx-soft)">'+d.lum+'%</span></div><input type="range" id="dLum_'+id+'" class="sl-int" min="0" max="100" value="'+d.lum+'" oninput="onDLum(\''+id+'\',this.value)"/></div>'+
     '</div></div>';}
-  if(t==='fx'){
-    const tiles=cfg.fx.map(f=>'<div class="fx-tile'+(d.fxId===f.id?' on':'')+'" onclick="onDFX(\''+id+'\','+f.id+')"><div class="fx-icon"><i class="fa-solid '+f.icon+'"></i></div><div class="fx-lbl">'+f.label+'</div></div>').join('');
-    return '<div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px">'+tiles+'</div>'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-size:9px;font-weight:700;letter-spacing:.1em;color:#3a3a3a;text-transform:uppercase">SPEED</span><span id="dFxSV_'+id+'" style="font-size:11px;font-family:monospace;color:#ff6b00">'+d.fxSpeed+'%</span></div>'+
-      '<input type="range" id="dFxS_'+id+'" class="sl-br" min="1" max="100" value="'+d.fxSpeed+'" oninput="onDFXSpeed(\''+id+'\',this.value)"/></div>';}
+  if(t==='fx')return buildEfxHTML(id);
   if(t==='lx'){const s=lxGet(id);return '<div>'+
     '<div style="display:flex;gap:4px;margin-bottom:7px">'+
       '<button onclick="lxMode(\''+id+'\',\'tap\')"  id="mm_tap_'+id+'"  class="lx-btn'+(s.mode==='tap'?' on':'')+'">TAP</button>'+
@@ -746,7 +904,7 @@ function buildTabHTML(id){
       '<button onclick="lxSpeed(\''+id+'\',\'storm\')"  id="ms_storm_'+id+'"  class="lx-btn'+(s.speed==='storm'?' on':'')+'">STORM</button>'+
     '</div>'+
     '<div style="display:flex;align-items:center;gap:5px;margin-bottom:7px">'+
-      '<span style="font-size:9px;color:#3a3a3a;font-weight:700">PAT</span>'+
+      '<span style="font-size:9px;color:var(--tx-faint);font-weight:700">PAT</span>'+
       '<button onclick="lxPat(\''+id+'\',1)" id="mp_1_'+id+'" class="lx-btn'+(s.pat===1?' on':'')+'" style="flex:none;padding:5px 10px">x1</button>'+
       '<button onclick="lxPat(\''+id+'\',2)" id="mp_2_'+id+'" class="lx-btn'+(s.pat===2?' on':'')+'" style="flex:none;padding:5px 10px">x2</button>'+
       '<button onclick="lxPat(\''+id+'\',3)" id="mp_3_'+id+'" class="lx-btn'+(s.pat===3?' on':'')+'" style="flex:none;padding:5px 10px">x3</button>'+
@@ -781,31 +939,31 @@ function buildDevCard(id,wrap){
   const statusCls=isConn?'on':isRecon?'rec':'off';
   const color=colorPreviewCSS(d);const bat=d.battery!=null?d.battery+'%':'--';
   const hasRGB=d.cap==='rgb';
-  wrap.style.background='#161616';wrap.style.border='1px solid #222';wrap.style.borderRadius='10px';wrap.style.overflow='hidden';
+  wrap.style.background='var(--bg-card)';wrap.style.border='1px solid var(--bd2)';wrap.style.borderRadius='10px';wrap.style.overflow='hidden';
   if(isConn)wrap.style.borderColor='rgba(0,230,118,.18)';
   wrap.innerHTML=
-    '<div id="sth_'+id+'" style="background:#0f0f0f;border-bottom:1px solid #1a1a1a;padding:7px 12px;display:flex;align-items:center;gap:7px">'+
+    '<div id="sth_'+id+'" style="background:var(--bg-panel);border-bottom:1px solid var(--bd1);padding:7px 12px;display:flex;align-items:center;gap:7px">'+
       '<div id="sdot_'+id+'" class="status-dot '+statusCls+'"></div>'+
       '<span class="bdg bdg-'+d.brand+'">'+d.brand.toUpperCase()+'</span>'+
       '<div id="cdot_'+id+'" class="color-dot" style="background:'+color+';box-shadow:0 0 5px '+color+'"></div>'+
-      '<span style="font-size:11px;font-weight:800;font-family:monospace;color:#aaa;margin-left:1px">'+
+      '<span style="font-size:11px;font-weight:800;font-family:monospace;color:var(--tx-soft);margin-left:1px">'+
         '<i class="fa-solid fa-battery-'+batIcon(d.battery)+'" style="font-size:9px;color:'+batColor(d.battery)+';margin-right:3px"></i>'+bat+
       '</span>'+
       '<span style="margin-left:auto;display:flex;align-items:center;gap:6px">'+
         sigBarsHTML(d.rssi)+
-        '<span style="font-size:9px;font-family:monospace;color:#2a2a2a">'+cfg.profVer+'</span>'+
+        '<span style="font-size:9px;font-family:monospace;color:var(--bd3)">'+cfg.profVer+'</span>'+
       '</span>'+
     '</div>'+
     '<div onclick="toggleExpand(\''+id+'\')" style="padding:10px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">'+
       '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#dde0ec">'+escH(d.name)+'</div>'+
-        '<div style="font-size:9px;color:#2a2a2a;margin-top:2px">'+protoName(d.brand)+' &nbsp;&middot;&nbsp; '+cfg.cctMin+'K &ndash; '+cfg.cctMax+'K &nbsp;&middot;&nbsp; '+cName(d.cap)+'</div>'+
+        '<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx1)">'+escH(d.name)+'</div>'+
+        '<div style="font-size:9px;color:var(--bd3);margin-top:2px">'+protoName(d.brand)+' &nbsp;&middot;&nbsp; '+cfg.cctMin+'K &ndash; '+cfg.cctMax+'K &nbsp;&middot;&nbsp; '+cName(d.cap)+'</div>'+
       '</div>'+
       '<button onclick="event.stopPropagation();removeDev(\''+id+'\')" style="width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,59,48,.2);border-radius:4px;color:#ff3b30;background:transparent;cursor:pointer;flex-shrink:0;font-size:11px"><i class="fa-solid fa-xmark"></i></button>'+
-      '<span id="chev_'+id+'" class="card-chevron" style="color:#2a2a2a;font-size:11px;flex-shrink:0;'+(d.expanded?'transform:rotate(180deg)':'')+'"><i class="fa-solid fa-chevron-down"></i></span>'+
+      '<span id="chev_'+id+'" class="card-chevron" style="color:var(--bd3);font-size:11px;flex-shrink:0;'+(d.expanded?'transform:rotate(180deg)':'')+'"><i class="fa-solid fa-chevron-down"></i></span>'+
     '</div>'+
-    '<div id="dctrl_'+id+'" class="card-body'+(d.expanded?' open':'')+'" style="border-top:1px solid #1a1a1a">'+
-      '<div style="display:flex;gap:3px;margin:10px 12px 8px;background:#0f0f0f;border-radius:5px;padding:3px">'+
+    '<div id="dctrl_'+id+'" class="card-body'+(d.expanded?' open':'')+'" style="border-top:1px solid var(--bd1)">'+
+      '<div style="display:flex;gap:3px;margin:10px 12px 8px;background:var(--bg-panel);border-radius:5px;padding:3px">'+
         '<button id="dtab_cct_'+id+'" onclick="switchDTab(\''+id+'\',\'cct\')" class="dev-tab'+(d.tab==='cct'?' on':'')+'">CCT</button>'+
         (hasRGB?'<button id="dtab_hsi_'+id+'" onclick="switchDTab(\''+id+'\',\'hsi\')" class="dev-tab'+(d.tab==='hsi'?' on':'')+'">HSI</button>':'')+
         '<button id="dtab_fx_'+id+'" onclick="switchDTab(\''+id+'\',\'fx\')" class="dev-tab'+(d.tab==='fx'?' on':'')+'">FX</button>'+
@@ -814,6 +972,7 @@ function buildDevCard(id,wrap){
       '<div id="dtc_'+id+'" style="padding:0 12px 12px">'+buildTabHTML(id)+'</div>'+
     '</div>';
   if(d.expanded&&d.tab==='hsi')setTimeout(()=>initWheel(id),60);
+  if(d.expanded&&d.tab==='fx')setTimeout(()=>initEfxWheel(id),60);
 }
 
 function toggleExpand(id){
@@ -822,6 +981,7 @@ function toggleExpand(id){
   if(ctrl)ctrl.classList.toggle('open',d.expanded);
   if(chev)chev.style.transform=d.expanded?'rotate(180deg)':'rotate(0deg)';
   if(d.expanded&&d.tab==='hsi')setTimeout(()=>initWheel(id),60);
+  if(d.expanded&&d.tab==='fx')setTimeout(()=>initEfxWheel(id),60);
 }
 function protoName(b){return{aputure:'NUS·XOR',nanlite:'FA55·UART',godox:'CRC8-Maxim'}[b]||b;}
 
@@ -845,8 +1005,8 @@ function updateMapNode(id){
   const color=colorPreviewCSS(d);const isConn=d.connected;
   el.style.left=d.mapX+'px';el.style.top=d.mapY+'px';
   el.innerHTML=
-    '<div class="mnode-ring" style="background:'+color+'22;border-color:'+(isConn?color:'#2a2a2a')+'">'+
-      '<i class="fa-solid fa-lightbulb" style="font-size:15px;color:'+(isConn?color:'#333')+'"></i>'+
+    '<div class="mnode-ring" style="background:'+color+'22;border-color:'+(isConn?color:'var(--bd3)')+'">'+
+      '<i class="fa-solid fa-lightbulb" style="font-size:15px;color:'+(isConn?color:'var(--bd4)')+'"></i>'+
     '</div>'+
     '<div style="font-size:9px;font-weight:700;color:'+(isConn?'rgba(255,255,255,.7)':'rgba(255,255,255,.25)')+';max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em;text-align:center">'+
       escH((d.name||'').slice(0,14))+
@@ -870,7 +1030,7 @@ function showMapControl(id){
   const d=DEV[id];if(!d)return;const color=colorPreviewCSS(d);const hasRGB=d.cap==='rgb';
   const content=document.getElementById('mapCtrlContent');
   content.innerHTML=
-    '<div style="width:36px;height:4px;background:#2a2a2a;border-radius:2px;margin:0 auto 14px"></div>'+
+    '<div style="width:36px;height:4px;background:var(--bd3);border-radius:2px;margin:0 auto 14px"></div>'+
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">'+
       '<div class="status-dot '+(d.connected?'on':d.status==='reconnecting'?'rec':'off')+'"></div>'+
       '<span class="bdg bdg-'+d.brand+'">'+d.brand.toUpperCase()+'</span>'+
@@ -878,7 +1038,7 @@ function showMapControl(id){
       '<span style="font-size:13px;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escH(d.name)+'</span>'+
       '<button onclick="document.getElementById(\'mapCtrlSheet\').style.display=\'none\'" style="color:#444;background:none;border:none;cursor:pointer;font-size:15px"><i class="fa-solid fa-xmark"></i></button>'+
     '</div>'+
-    '<div style="display:flex;gap:3px;background:#0f0f0f;border-radius:5px;padding:3px;margin-bottom:10px">'+
+    '<div style="display:flex;gap:3px;background:var(--bg-panel);border-radius:5px;padding:3px;margin-bottom:10px">'+
       '<button id="dtab_cct_'+id+'" onclick="switchDTab(\''+id+'\',\'cct\')" class="dev-tab'+(d.tab==='cct'?' on':'')+'">CCT</button>'+
       (hasRGB?'<button id="dtab_hsi_'+id+'" onclick="switchDTab(\''+id+'\',\'hsi\')" class="dev-tab'+(d.tab==='hsi'?' on':'')+'">HSI</button>':'')+
       '<button id="dtab_fx_'+id+'" onclick="switchDTab(\''+id+'\',\'fx\')" class="dev-tab'+(d.tab==='fx'?' on':'')+'">FX</button>'+
@@ -929,9 +1089,9 @@ function lxPat(scope,pat){
 }
 
 function openValidation(){
-  let html='<div style="font-weight:800;color:#dde0ec;margin-bottom:12px">빛스포크 v4.2 — Protocol Suite</div>';
+  let html='<div style="font-weight:800;color:var(--tx1);margin-bottom:12px">빛스포크 v4.2 — Protocol Suite</div>';
   for(const[brand,cfg]of Object.entries(FDB)){
-    html+='<div style="background:#111;border:1px solid #1e1e1e;border-radius:6px;padding:10px;margin-bottom:8px">'+
+    html+='<div style="background:var(--bg-sunken);border:1px solid var(--bg-btn2);border-radius:6px;padding:10px;margin-bottom:8px">'+
       '<div style="font-weight:700;color:'+brandColor(brand)+';margin-bottom:6px">'+brand.toUpperCase()+' — '+cfg.profVer+'</div>'+
       '<div style="display:grid;grid-template-columns:auto 1fr;gap:3px 8px;font-size:10px;color:#555">'+
         '<span>SVC</span><span style="font-family:monospace;color:#888;word-break:break-all">'+cfg.svc+'</span>'+
@@ -1009,7 +1169,7 @@ function onSuppSearch(val) {
 function renderSuppResults(results) {
   const el = document.getElementById('suppResults');
   if (!results.length) {
-    el.innerHTML = '<div class="supp-empty"><i class="fa-solid fa-magnifying-glass" style="font-size:22px;color:#1e1e1e;display:block;margin-bottom:8px"></i>검색 결과 없음 — 아래 직접 입력란을 사용하세요</div>';
+    el.innerHTML = '<div class="supp-empty"><i class="fa-solid fa-magnifying-glass" style="font-size:22px;color:var(--bg-btn2);display:block;margin-bottom:8px"></i>검색 결과 없음 — 아래 직접 입력란을 사용하세요</div>';
     return;
   }
   const brandColor = { godox:'#00e5ff', aputure:'#ffd700', nanlite:'#c8d4ff' };
@@ -1020,7 +1180,7 @@ function renderSuppResults(results) {
     return `<div class="supp-item">
       <div class="supp-item-info">
         <div class="supp-item-model" style="color:${brandColor[_suppBrand]}">${d.model}
-          <span style="font-size:9px;color:#333;font-weight:700;margin-left:6px">${d.series} ${d.year}</span>
+          <span style="font-size:9px;color:var(--bd4);font-weight:700;margin-left:6px">${d.series} ${d.year}</span>
           ${isCustom ? '<span style="font-size:9px;color:#00e676;margin-left:5px">✓ 적용됨</span>' : ''}
         </div>
         <div class="supp-item-meta">
@@ -1098,11 +1258,25 @@ function saveCustomProfile(profile) {
 function savePersist(){try{const s={};for(const[id,d]of Object.entries(DEV))s[id]={...d};localStorage.setItem('swm4',JSON.stringify(s));}catch(e){console.warn('[persist save]',e.message);}}
 function loadPersist(){try{const raw=localStorage.getItem('swm4');if(!raw)return;const s=JSON.parse(raw);for(const[id,d]of Object.entries(s))DEV[id]={...d,connected:false,status:'offline',expanded:false};renderHome();console.log('[persist] Restored',Object.keys(s).length,'devices');}catch(e){console.warn('[persist load]',e.message);}}
 
+// ===== 테마 (다크/라이트) =====
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  const b=document.getElementById('themeBtn');
+  if(b)b.innerHTML='<i class="fa-solid '+(t==='light'?'fa-moon':'fa-sun')+'" style="font-size:12px"></i>';
+  const mc=document.querySelector('meta[name=theme-color]');
+  if(mc)mc.setAttribute('content',t==='light'?'#eceef2':'#0a0a0a');
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  applyTheme(cur);try{localStorage.setItem('lb_theme',cur);}catch(e){}
+}
 function init(){
+  let th='dark';try{th=localStorage.getItem('lb_theme')||'dark';}catch(e){}
+  applyTheme(th);
   if(OS==='ios'){document.getElementById('iosBar').style.display='block';document.getElementById('iosHint').style.display='block';}
   if(!BLE_OK&&OS!=='ios')setTimeout(()=>toast('Web Bluetooth 미지원 — Chrome/Edge 필요'),500);
   loadPersist();
-  console.log('[LIGHT-BESPOKE v4.2] OS='+OS+' BLE='+BLE_OK);
+  console.log('[LIGHT-BESPOKE v4.2] OS='+OS+' BLE='+BLE_OK+' theme='+th);
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
