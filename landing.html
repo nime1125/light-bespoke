@@ -469,21 +469,22 @@
          target="_blank" class="os-btn os-btn-ios">
         <i class="fa-brands fa-apple"></i>
         <div class="btn-label">Download for iOS</div>
-        <div class="btn-sub">Bluefy / Chrome</div>
+        <div class="btn-sub">웹앱 · Bluefy (APK 미지원)</div>
       </a>
-      <button id="btn-android" onclick="triggerPwaInstallation()" class="os-btn os-btn-android">
+      <a id="btn-android" href="https://github.com/nime1125/light-bespoke/releases/latest/download/light-bespoke.apk"
+         class="os-btn os-btn-android">
         <i class="fa-brands fa-android"></i>
         <div class="btn-label">Download for Android</div>
-        <div class="btn-sub">Chrome 설치</div>
-      </button>
+        <div class="btn-sub">네이티브 APK 설치</div>
+      </a>
     </div>
 
-    <!-- App install button -->
+    <!-- App install button (웹앱 — 설치 없이 브라우저로 바로 실행) -->
     <button id="installBtn" class="install-btn" onclick="handleInstall()">
       <div class="install-icon-ring">
-        <i class="fa-solid fa-download" id="installIcon"></i>
+        <i class="fa-solid fa-bolt" id="installIcon"></i>
       </div>
-      <div class="install-label">앱 설치 시작</div>
+      <div class="install-label">웹앱으로 바로 실행 (설치 없이)</div>
     </button>
 
     <!-- iOS URL copy (shown only on iOS) -->

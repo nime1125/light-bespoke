@@ -2,7 +2,7 @@
   "name": "LIGHT-BESPOKE BLE Lighting Controller",
   "short_name": "LIGHT-BESPOKE",
   "description": "LIGHT-BESPOKE — Professional Bluetooth LED Lighting Controller · Aputure · Nanlite · Godox",
-  "start_url": "./app.html",
+  "start_url": "./landing.html",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#090b10",
