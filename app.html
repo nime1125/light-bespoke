@@ -1095,7 +1095,7 @@ function saveCustomProfile(profile) {
   localStorage.setItem('lb_custProf', JSON.stringify(list));
 }
 
-try{const s={};for(const[id,d]of Object.entries(DEV))s[id]={...d};localStorage.setItem('swm4',JSON.stringify(s));}catch(e){console.warn('[persist save]',e.message);}}
+function savePersist(){try{const s={};for(const[id,d]of Object.entries(DEV))s[id]={...d};localStorage.setItem('swm4',JSON.stringify(s));}catch(e){console.warn('[persist save]',e.message);}}
 function loadPersist(){try{const raw=localStorage.getItem('swm4');if(!raw)return;const s=JSON.parse(raw);for(const[id,d]of Object.entries(s))DEV[id]={...d,connected:false,status:'offline',expanded:false};renderHome();console.log('[persist] Restored',Object.keys(s).length,'devices');}catch(e){console.warn('[persist load]',e.message);}}
 
 function init(){
