@@ -340,6 +340,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     <button id="pairStartBtn" onclick="doPair()" style="width:100%;padding:14px;border-radius:10px;background:#ff6b00;color:#000;font-size:14px;font-weight:800;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
       <i class="fa-brands fa-bluetooth"></i>BLE 스캔 시작
     </button>
+    <div style="display:flex;align-items:center;gap:8px;margin:12px 0 8px;color:var(--bd4);font-size:10px"><div style="flex:1;height:1px;background:var(--bd2)"></div>또는<div style="flex:1;height:1px;background:var(--bd2)"></div></div>
+    <button onclick="sidusPrompt()" style="width:100%;padding:13px;border-radius:10px;background:rgba(70,170,95,.1);color:#5fd07f;border:1px solid rgba(70,170,95,.4);font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      <i class="fa-solid fa-tower-broadcast"></i>amaran(Sidus) 메시 연결
+    </button>
+    <div style="font-size:10px;color:var(--bd4);line-height:1.6;margin-top:8px">Aputure/amaran은 <strong style="color:#5fd07f">amaran Desktop</strong> 앱 실행 + Open API 키가 필요합니다(메시 기반이라 가장 안정적 · 끊김 없음).</div>
   </div>
 </div>
 
@@ -685,7 +690,70 @@ async function heartbeat(){
     if(b&&b.length){const ok=await writeBLE(id,b);if(ok)d.lastSync=Date.now();else if(g.server&&!g.server.connected)onDisconn(id);}
   }
 }
-async function pollAll(){const ids=Object.keys(DEV);for(const id of ids){if(!DEV[id].connected)continue;await pollOne(id);}renderHome();}
+// ===== SIDUS / amaran Open API (WebSocket 메시 — 끊김 없는 지속 연결) =====
+// amaran Desktop이 ws://127.0.0.1:12345 서버를 열고 Sidus Mesh로 조명을 지속 연결한다.
+// 인증: AES-256-GCM(타임스탬프) 토큰(요청마다 갱신). 제어: set_intensity/cct/hsi/rgb/system_effect.
+const SIDUS={ws:null,connected:false,key:null,reqId:1,pending:{},clientId:Math.floor(Math.random()*1e6)+1,retry:0};
+const SIDUS_EFFECTS=['paparazzi','fireworks','fault_bulb','lightning','tv','pulsing','strobe','explosion','club_lights','candle','fire','welding','cop_car','color_chase','party_lights'];
+function isSidus(id){return DEV[id]&&DEV[id].transport==='sidus';}
+async function sidusToken(){
+  const raw=Uint8Array.from(atob(SIDUS.key),c=>c.charCodeAt(0));
+  const k=await crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt']);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const data=new TextEncoder().encode(Math.floor(Date.now()/1000).toString());
+  const out=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,tagLength:128},k,data));
+  const ct=out.slice(0,out.length-16),tag=out.slice(out.length-16);
+  const comb=new Uint8Array(28+ct.length);comb.set(iv,0);comb.set(tag,12);comb.set(ct,28);
+  let s='';for(const b of comb)s+=String.fromCharCode(b);return btoa(s);
+}
+function sidusSend(action,args,nodeId){
+  return new Promise(async res=>{
+    if(!SIDUS.ws||SIDUS.ws.readyState!==1){res(null);return;}
+    const id=SIDUS.reqId++;
+    let token;try{token=await sidusToken();}catch(e){res(null);return;}
+    const msg={version:2,type:'request',client_id:SIDUS.clientId,request_id:id,action,token};
+    if(nodeId)msg.node_id=nodeId;if(args)msg.args=args;
+    SIDUS.pending[id]=res;setTimeout(()=>{if(SIDUS.pending[id]){delete SIDUS.pending[id];res(null);}},6000);
+    try{SIDUS.ws.send(JSON.stringify(msg));}catch(e){delete SIDUS.pending[id];res(null);}
+  });
+}
+function sidusConnect(key){
+  if(key)SIDUS.key=key;if(!SIDUS.key){toast('Sidus API 키가 필요합니다');return;}
+  try{localStorage.setItem('lb_sidusKey',SIDUS.key);}catch(e){}
+  let ws;try{ws=new WebSocket('ws://127.0.0.1:12345');}catch(e){toast('Sidus 연결 불가 — amaran Desktop 실행 확인');return;}
+  SIDUS.ws=ws;
+  ws.onopen=async()=>{SIDUS.connected=true;SIDUS.retry=0;toast('amaran(Sidus) 연결됨');cble('[SIDUS] connected');await sidusLoadFixtures();renderHome();};
+  ws.onmessage=ev=>sidusOnMsg(ev.data);
+  ws.onerror=()=>{cble('[SIDUS] ws error');};
+  ws.onclose=()=>{SIDUS.connected=false;for(const id of Object.keys(DEV))if(DEV[id].transport==='sidus'){DEV[id].connected=false;DEV[id].status='disconnected';}renderHome();if(SIDUS.key&&SIDUS.retry<30){SIDUS.retry++;setTimeout(()=>{if(SIDUS.key)sidusConnect();},Math.min(2000*SIDUS.retry,8000));}};
+}
+function sidusDisconnect(){SIDUS.key=null;try{localStorage.removeItem('lb_sidusKey');}catch(e){}if(SIDUS.ws){try{SIDUS.ws.close();}catch(e){}}SIDUS.ws=null;SIDUS.connected=false;for(const id of Object.keys(DEV))if(DEV[id].transport==='sidus')delete DEV[id];renderHome();toast('amaran(Sidus) 연결 해제');}
+async function sidusLoadFixtures(){
+  const r=await sidusSend('get_fixture_list');if(!r||!r.data){toast('Sidus 기기 목록 비어있음');return;}
+  for(const f of r.data){
+    const nid=f.node_id||f.id;const id='sidus_'+nid;
+    let cfg=await sidusSend('get_node_config',null,nid);cfg=cfg&&cfg.data?cfg.data:{};
+    const cap=(cfg.hsi_support||cfg.rgb_support)?'rgb':'bicolor';
+    if(!DEV[id])DEV[id]={id,node:nid,name:f.name||'amaran',brand:'aputure',transport:'sidus',cap,br:100,cct:Math.round(((cfg.cct_min||2800)+(cfg.cct_max||10000))/2),h:0,s:100,lum:100,fxId:0,fxSpeed:50,efxDim:100,tab:'cct',connected:true,battery:null,rssi:null,lastSync:0,dirty:false,pairedAt:Date.now(),expanded:false,mapX:null,mapY:null};
+    else{DEV[id].connected=true;DEV[id].node=nid;}
+  }
+  savePersist();renderHome();
+}
+function sidusOnMsg(raw){let m;try{m=JSON.parse(raw);}catch(e){return;}if(m.type==='response'&&m.request_id!=null&&SIDUS.pending[m.request_id]){SIDUS.pending[m.request_id](m);delete SIDUS.pending[m.request_id];}else if(m.type==='event')sidusEvent(m);}
+function sidusEvent(m){const id='sidus_'+m.node_id,d=DEV[id];if(!d||!m.data)return;
+  if(m.event==='intensity_changed'&&m.data.intensity!=null)d.br=Math.round(m.data.intensity/10);
+  else if(m.event==='cct_changed'&&m.data.cct!=null)d.cct=m.data.cct;
+  else if(m.event==='hsi_changed'){if(m.data.hue!=null)d.h=m.data.hue;if(m.data.sat!=null)d.s=m.data.sat;}
+  refreshDevSlider(id);updateColorDot(id);}
+// Sidus 제어 (값 범위: intensity 0~1000, hue 0~360, sat 0~100, cct 켈빈)
+function sidusIntensity(id){const d=DEV[id];sidusSend('set_intensity',{intensity:Math.max(0,Math.min(1000,Math.round(d.br*10)))},d.node);}
+function sidusCCT(id){const d=DEV[id];sidusSend('set_cct',{cct:d.cct},d.node);}
+function sidusHSI(id){const d=DEV[id];sidusSend('set_hsi',{hue:Math.round(d.h),sat:Math.round(d.s),intensity:Math.max(0,Math.min(1000,Math.round((d.lum||100)*10)))},d.node);}
+function efxToSidus(lb){lb=(lb||'').toLowerCase();const m={'파파라치':'paparazzi','번개':'lightning','불량전구':'fault_bulb','tv':'tv','불꽃':'fire','폭풍':'lightning','플래시':'strobe','펄스':'pulsing','경광등':'cop_car','폭발':'explosion','캔들':'candle','불꽃놀이':'fireworks','파티':'party_lights','색상루프':'color_chase','클럽':'club_lights','디스코':'club_lights','레이저':'party_lights'};return m[lb]||(SIDUS_EFFECTS.indexOf(lb)>=0?lb:'');}
+function sidusEffect(id){const d=DEV[id],cfg=FDB[d.brand];const cur=cfg.fx.find(f=>f.id===d.fxId);const name=efxToSidus(cur?cur.label:'');if(name)sidusSend('set_system_effect',{effect_type:name},d.node);sidusSend('set_intensity',{intensity:Math.max(0,Math.min(1000,Math.round((d.efxDim||d.br||100)*10)))},d.node);}
+function sidusPrompt(){const k=prompt('amaran Open API 시크릿 키 입력\n(amaran Desktop → 설정에서 발급. amaran Desktop이 실행 중이어야 합니다)',SIDUS.key||'');if(k!=null&&k.trim())sidusConnect(k.trim());}
+
+async function pollAll(){const ids=Object.keys(DEV);for(const id of ids){if(!DEV[id].connected||DEV[id].transport==='sidus')continue;await pollOne(id);}renderHome();}
 async function pollOne(id){
   const g=GATT[id],d=DEV[id];if(!g||!d)return;
   try{const bs=await g.server.getPrimaryService('battery_service');const bc=await bs.getCharacteristic('battery_level');const v=await bc.readValue();d.battery=v.getUint8(0);}catch(_){}
@@ -708,11 +776,11 @@ function quickBr(val){document.getElementById('mBr').value=val;onMBr(val);}
 function masterOff(){quickBr(0);toast('전체 소등');}
 function masterSync(){for(const id of Object.keys(DEV)){if(DEV[id].connected)forceRestore(id);}toast('전체 싱크');}
 
-function onDBr(id,val){DEV[id].br=+val;const e=document.getElementById('dBrV_'+id);if(e)e.textContent=val+'%';dbSend(id,pktBr(DEV[id].brand,+val));DEV[id].dirty=true;updateColorDot(id);savePersist();}
-function onDCct(id,val){DEV[id].cct=+val;const e=document.getElementById('dCctV_'+id);if(e)e.textContent=val+'K';const c=FDB[DEV[id].brand];dbSend(id,pktCCT(DEV[id].brand,+val,c.cctMin,c.cctMax));DEV[id].dirty=true;updateColorDot(id);savePersist();}
-function onDSat(id,val){DEV[id].s=+val;const e=document.getElementById('dSatV_'+id);if(e)e.textContent=val+'%';const d=DEV[id];dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();}
-function onDLum(id,val){DEV[id].lum=+val;const e=document.getElementById('dLumV_'+id);if(e)e.textContent=val+'%';const d=DEV[id];dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();}
-function onDFX(id,fxId){DEV[id].fxId=fxId;writeNow(id,pktFX(DEV[id].brand,fxId,DEV[id].fxSpeed));DEV[id].dirty=true;savePersist();rebuildTab(id);}
+function onDBr(id,val){DEV[id].br=+val;const e=document.getElementById('dBrV_'+id);if(e)e.textContent=val+'%';if(isSidus(id))sidusIntensity(id);else dbSend(id,pktBr(DEV[id].brand,+val));DEV[id].dirty=true;updateColorDot(id);savePersist();}
+function onDCct(id,val){DEV[id].cct=+val;const e=document.getElementById('dCctV_'+id);if(e)e.textContent=val+'K';const c=FDB[DEV[id].brand];if(isSidus(id))sidusCCT(id);else dbSend(id,pktCCT(DEV[id].brand,+val,c.cctMin,c.cctMax));DEV[id].dirty=true;updateColorDot(id);savePersist();}
+function onDSat(id,val){DEV[id].s=+val;const e=document.getElementById('dSatV_'+id);if(e)e.textContent=val+'%';const d=DEV[id];if(isSidus(id))sidusHSI(id);else dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();}
+function onDLum(id,val){DEV[id].lum=+val;const e=document.getElementById('dLumV_'+id);if(e)e.textContent=val+'%';const d=DEV[id];if(isSidus(id))sidusHSI(id);else dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();}
+function onDFX(id,fxId){DEV[id].fxId=fxId;if(isSidus(id))sidusEffect(id);else writeNow(id,pktFX(DEV[id].brand,fxId,DEV[id].fxSpeed));DEV[id].dirty=true;savePersist();rebuildTab(id);}
 function onDFXSpeed(id,val){DEV[id].fxSpeed=+val;const e=document.getElementById('dFxSV_'+id);if(e)e.textContent=val+'%';if(DEV[id].fxId>0)dbSend(id,pktFX(DEV[id].brand,DEV[id].fxId,+val));savePersist();}
 
 // ===== EFFECT PAGE (효과 페이지) =====
@@ -785,6 +853,7 @@ function efxCyAd(d){return[({one:0,two:1,reverse:2})[d.efxCycle]||0,({off:0,flas
 // 주의: 3사 효과 패킷 사양은 공개 자료에 없어 앱 자체 규약을 확장한 것 — 실기기 HCI 캡처로 검증 필요
 function sendEfx(id){
   const d=DEV[id];if(!d||!d.connected)return;const cfg=FDB[d.brand];
+  if(isSidus(id)){sidusEffect(id);return;}
   const ca=efxCyAd(d);
   if(d.fxId>0)writeNow(id,pktFX(d.brand,d.fxId,d.fxSpeed,ca[0],ca[1]));
   const cur=cfg.fx.find(f=>f.id===d.fxId);const P=efxParams(cur?cur.label:'');
@@ -792,10 +861,10 @@ function sendEfx(id){
   else if(P.cct){const b=pktCCT(d.brand,d.efxCct,cfg.cctMin,cfg.cctMax);if(b.length)setTimeout(()=>writeNow(id,b),60);}
   const bb=pktBr(d.brand,d.efxDim);if(bb.length)setTimeout(()=>writeNow(id,bb),120);
 }
-function efxSendColor(id){const d=DEV[id];if(!d||!d.connected)return;const b=pktRGB(d.brand,d.efxHue,d.efxSat,d.efxDim);if(b.length)dbSend(id,b);}
-function efxSendCct(id){const d=DEV[id];if(!d||!d.connected)return;const cfg=FDB[d.brand];const b=pktCCT(d.brand,d.efxCct,cfg.cctMin,cfg.cctMax);if(b.length)dbSend(id,b);}
+function efxSendColor(id){const d=DEV[id];if(!d||!d.connected)return;if(isSidus(id)){d.h=d.efxHue;d.s=d.efxSat;d.lum=d.efxDim;sidusHSI(id);return;}const b=pktRGB(d.brand,d.efxHue,d.efxSat,d.efxDim);if(b.length)dbSend(id,b);}
+function efxSendCct(id){const d=DEV[id];if(!d||!d.connected)return;if(isSidus(id)){d.cct=d.efxCct;sidusCCT(id);return;}const cfg=FDB[d.brand];const b=pktCCT(d.brand,d.efxCct,cfg.cctMin,cfg.cctMax);if(b.length)dbSend(id,b);}
 function efxStep(id,dir){const d=DEV[id],fxs=FDB[d.brand].fx;if(!fxs.length)return;let i=fxs.findIndex(f=>f.id===d.fxId);if(i<0)i=0;i=(i+dir+fxs.length)%fxs.length;d.fxId=fxs[i].id;sendEfx(id);d.dirty=true;savePersist();rebuildTab(id);}
-function onEfxDim(id,v){const d=DEV[id];d.efxDim=+v;d.br=+v;const e=document.getElementById('efxDimV_'+id);if(e)e.textContent=v+'%';dbSend(id,pktBr(d.brand,+v));d.dirty=true;savePersist();}
+function onEfxDim(id,v){const d=DEV[id];d.efxDim=+v;d.br=+v;const e=document.getElementById('efxDimV_'+id);if(e)e.textContent=v+'%';if(isSidus(id))sidusIntensity(id);else dbSend(id,pktBr(d.brand,+v));d.dirty=true;savePersist();}
 function onEfxHue(id,v){const d=DEV[id];d.efxHue=+v;const e=document.getElementById('efxHueV_'+id);if(e)e.textContent=v+'°';const s=document.getElementById('efxSatV_'+id);if(s){const sl=s.parentElement.nextElementSibling;if(sl&&sl.tagName==='INPUT')sl.style.background='linear-gradient(to right,#808080,hsl('+v+',100%,50%))';}efxSendColor(id);savePersist();}
 function onEfxSat(id,v){const d=DEV[id];d.efxSat=+v;const e=document.getElementById('efxSatV_'+id);if(e)e.textContent=v+'%';efxSendColor(id);savePersist();}
 function onEfxCct(id,v){const d=DEV[id];d.efxCct=+v;const e=document.getElementById('efxCctV_'+id);if(e)e.textContent=v+'K';efxSendCct(id);savePersist();}
@@ -805,7 +874,7 @@ function efxAddon(id,a){DEV[id].efxAddon=a;['off','flash','rflash','pulse'].forE
 function onDHue(id,val){
   DEV[id].h=+val;const e=document.getElementById('dHueV_'+id);if(e)e.textContent=val+'°';
   const sat=document.getElementById('dSat_'+id);if(sat)sat.style.background='linear-gradient(to right,#808080,hsl('+val+',100%,50%))';
-  updateWheelCrosshair(id);const d=DEV[id];dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();
+  updateWheelCrosshair(id);const d=DEV[id];if(isSidus(id))sidusHSI(id);else dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();
 }
 function switchDTab(id,t){DEV[id].tab=t;rebuildTab(id);['cct','hsi','fx','lx'].forEach(tab=>{const el=document.getElementById('dtab_'+tab+'_'+id);if(el)el.classList.toggle('on',tab===t);});if(t==='hsi')setTimeout(()=>{initWheel(id);updateWheelCrosshair(id);},60);else if(t==='fx')setTimeout(()=>{initEfxWheel(id);updateEfxCross(id);},60);}
 function rebuildTab(id){const el=document.getElementById('dtc_'+id);if(el)el.innerHTML=buildTabHTML(id);const t=DEV[id].tab;if(t==='hsi')setTimeout(()=>initWheel(id),60);else if(t==='fx')setTimeout(()=>initEfxWheel(id),60);}
@@ -842,7 +911,7 @@ function wheelPickColor(id,cx,cy){
   if(hueEl)hueEl.value=d.h;if(satEl){satEl.value=d.s;satEl.style.background='linear-gradient(to right,#808080,hsl('+d.h+',100%,50%))';}
   const hueV=document.getElementById('dHueV_'+id),satV=document.getElementById('dSatV_'+id);
   if(hueV)hueV.textContent=d.h+'°';if(satV)satV.textContent=d.s+'%';
-  updateWheelCrosshair(id);dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();
+  updateWheelCrosshair(id);if(isSidus(id))sidusHSI(id);else dbSend(id,pktRGB(d.brand,d.h,d.s,d.lum));d.dirty=true;updateColorDot(id);savePersist();
 }
 function updateWheelCrosshair(id){
   const d=DEV[id],canvas=document.getElementById('whl_'+id),cross=document.getElementById('whlC_'+id);
@@ -1305,6 +1374,7 @@ function toggleTheme(){
 function init(){
   let th='dark';try{th=localStorage.getItem('lb_theme')||'dark';}catch(e){}
   applyTheme(th);
+  try{const sk=localStorage.getItem('lb_sidusKey');if(sk){SIDUS.key=sk;sidusConnect();}}catch(e){}
   if(OS==='ios'){document.getElementById('iosBar').style.display='block';document.getElementById('iosHint').style.display='block';}
   if(!BLE_OK&&OS!=='ios')setTimeout(()=>toast('Web Bluetooth 미지원 — Chrome/Edge 필요'),500);
   loadPersist();
