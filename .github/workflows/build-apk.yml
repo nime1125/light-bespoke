@@ -35,7 +35,7 @@ jobs:
 
       - name: Add dependencies
         working-directory: build_app
-        run: flutter pub add flutter_blue_plus shared_preferences
+        run: flutter pub add flutter_blue_plus shared_preferences permission_handler
 
       - name: Inject BLE permissions
         run: |
