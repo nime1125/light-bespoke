@@ -32,6 +32,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(const LightApp());
 
@@ -95,10 +96,19 @@ ThemeData buildTheme() => ThemeData(
 //  체크섬 / 어댑터 인터페이스 / 브랜드 구현 / 팩토리
 // ─────────────────────────────────────────────────────────────────────────────
 class Checksum {
-  static int sumLow(List<int> bytes) {
+  // 🔧 교정 포인트(체크섬): 기기가 패킷을 거부하면 이 공식을 캡처값에 맞게 교체.
+  //   sum&0xFF(현재) / XOR / 2의보수((0x100-sum)&0xFF) / CRC8-Maxim 중 택1.
+  static int sumLow(List<int> bytes) {              // Σbytes & 0xFF
     int s = 0;
     for (final b in bytes) s += b;
     return s & 0xFF;
+  }
+  static int xor8(List<int> bytes) { int x = 0; for (final b in bytes) x ^= b; return x & 0xFF; }
+  static int twos(List<int> bytes) { int s = 0; for (final b in bytes) s += b; return (0x100 - (s & 0xFF)) & 0xFF; }
+  static int crc8Maxim(List<int> bytes) {
+    int c = 0;
+    for (final b in bytes) { c ^= b & 0xFF; for (int i = 0; i < 8; i++) c = (c & 1) != 0 ? (c >> 1) ^ 0x8C : (c >> 1); }
+    return c & 0xFF;
   }
 }
 
@@ -127,6 +137,8 @@ class GodoxAdapter extends LightAdapter {
 
   static const List<int> _on = [0x55, 0xAA, 0x01, 0x01, 0x00, 0xFE];
   static const List<int> _off = [0x55, 0xAA, 0x01, 0x00, 0x00, 0xFF];
+  // 🔧 교정(Godox): 프레임 [55 AA cmd value 00 checksum]. cmd(전원01·밝기02·CCT03·HSI04·효과07추정)
+  //   value 스케일·checksum(sumLow→xor8/twos/crc8Maxim)을 HCI 캡처값에 맞춰 수정.
   List<int> _frame(int cmd, int v) {
     final body = [0x55, 0xAA, cmd, v & 0xFF, 0x00];
     return [...body, Checksum.sumLow(body)];
@@ -148,6 +160,8 @@ class NanliteAdapter extends LightAdapter {
   List<int> _stream(int opt, int v16) =>
       [0x03, 0x20, opt, 0x01, (v16 >> 8) & 0xFF, v16 & 0xFF, 0x00, 0x04];
 
+  // 🔧 교정(Nanlite): 8바이트 [03 20 opt 01 valHi valLo 00 04]. opt(밝기01·CCT03·Hue05·Sat0C),
+  //   value 엔디안/위치(idx4·5), 효과 opcode 를 캡처값에 맞춰 수정.
   @override List<int> encodeBrightness(int p) => [0x03, 0x20, 0x01, 0x01, 0x00, clampPct(p), 0x00, 0x04];
   @override List<int> encodePower(bool isOn) => encodeBrightness(isOn ? 100 : 0);
   @override List<int> encodeCct(int k) => _stream(0x03, k);
@@ -171,6 +185,8 @@ class AputureAdapter extends LightAdapter {
     return [...h, ...p, x & 0xFF];
   }
 
+  // 🔧 교정(Aputure/Sidus Mesh): header[2]=nodeId, header[3]=cmd, payload·XOR.
+  //   ※ 메시 암호화로 직접 GATT 미작동 시 Sidus Open API(WebSocket) 경로로 전환.
   @override List<int> encodePower(bool isOn) => _mesh(0x01, [isOn ? 0x01 : 0x00]);
   @override List<int> encodeBrightness(int p) => _mesh(0x02, [clampPct(p)]);
   @override List<int> encodeCct(int k) => _mesh(0x03, [(k >> 8) & 0xFF, k & 0xFF]);
@@ -403,25 +419,59 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _scanning = false;
   final Map<String, LightController> _connected = {};
 
+  // 스캔 결과에서 표시 이름(광고이름 우선 — 스캔 단계 platformName은 보통 비어있음)
+  String _nameOf(ScanResult r) {
+    final a = r.advertisementData.advName;
+    if (a.isNotEmpty) return a;
+    if (r.device.platformName.isNotEmpty) return r.device.platformName;
+    return '';
+  }
+
   Future<void> _scan() async {
-    // 권한/어댑터 상태는 flutter_blue_plus 가 OS 다이얼로그로 처리
-    if (await FlutterBluePlus.isSupported == false) {
-      _toast('이 기기는 BLE 미지원');
+    if (await FlutterBluePlus.isSupported == false) { _toast('이 기기는 BLE 미지원'); return; }
+
+    // ★ Android 12+ 런타임 권한 요청 (없으면 스캔 결과가 0 → 리스트 안 뜸)
+    final st = await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.locationWhenInUse,
+    ].request();
+    if (st[Permission.bluetoothScan]?.isGranted != true ||
+        st[Permission.bluetoothConnect]?.isGranted != true) {
+      PacketLogger.I.log('권한 거부: BLUETOOTH_SCAN/CONNECT — 설정에서 허용 필요');
+      _toast('블루투스 권한을 허용해주세요');
+      if (st.values.any((s) => s.isPermanentlyDenied)) await openAppSettings();
       return;
     }
+
+    // 어댑터 ON 확인
+    try {
+      if (await FlutterBluePlus.adapterState.first != BluetoothAdapterState.on) {
+        await FlutterBluePlus.turnOn();
+      }
+    } catch (_) {}
+
     setState(() => _scanning = true);
     PacketLogger.I.log('스캔 시작...');
     try {
-      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 6));
+      await FlutterBluePlus.startScan(
+        timeout: const Duration(seconds: 8),
+        androidUsesFineLocation: false,   // neverForLocation 선언과 일치
+      );
       await FlutterBluePlus.isScanning.where((s) => s == false).first;
     } finally {
       if (mounted) setState(() => _scanning = false);
     }
   }
 
-  Future<void> _connect(BluetoothDevice d) async {
-    final brand = detectBrand(d.platformName);
-    if (brand == null) { _toast('지원 브랜드가 아닙니다(이름 미인식)'); return; }
+  Future<void> _connect(BluetoothDevice d, String name) async {
+    final brand = detectBrand(name);
+    if (brand == null) {
+      // 미인식 이름은 로그로 남겨 detectBrand 패턴을 추가할 수 있게 함
+      PacketLogger.I.log('미인식 기기: "$name" (${d.remoteId.str}) — 패턴 추가 필요');
+      _toast('브랜드 미인식: "$name"');
+      return;
+    }
     final c = LightController(d, AdapterFactory.create(brand));
     try {
       await c.connect();
@@ -429,7 +479,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() {});
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => ControlScreen(controller: c, title: d.platformName)));
+          builder: (_) => ControlScreen(controller: c, title: name)));
     } catch (e) {
       PacketLogger.I.log('연결 실패: $e');
       _toast('연결 실패: $e');
@@ -467,9 +517,11 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(child: StreamBuilder<List<ScanResult>>(
           stream: FlutterBluePlus.scanResults, initialData: const [],
           builder: (context, snap) {
-            final results = (snap.data ?? []).where((r) => detectBrand(r.device.platformName) != null).toList();
+            // ★ 브랜드 과필터 제거: 스캔된 모든 기기를 표시(이름은 advName 우선)
+            final results = (snap.data ?? []).toList()
+              ..sort((a, b) => b.rssi.compareTo(a.rssi)); // 가까운 순
             if (results.isEmpty) {
-              return Center(child: Text(_scanning ? '조명 검색 중...' : 'PAIR 로 BLE 조명을 검색하세요',
+              return Center(child: Text(_scanning ? '조명 검색 중...' : 'PAIR 로 BLE 기기를 검색하세요',
                   style: const TextStyle(color: AppColors.textSub, fontSize: 12)));
             }
             return ListView.separated(
@@ -477,15 +529,17 @@ class _HomeScreenState extends State<HomeScreen> {
               separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemBuilder: (_, i) {
                 final r = results[i];
-                final brand = detectBrand(r.device.platformName)!;
+                final nm = _nameOf(r);
+                final disp = nm.isEmpty ? '(이름 없음)' : nm;
+                final brand = detectBrand(nm);          // null 이면 'BLE' 로 표시
                 final connected = _connected.containsKey(r.device.remoteId.str);
                 return _DeviceCard(
-                  name: r.device.platformName.isEmpty ? 'Unknown' : r.device.platformName,
-                  brand: brand, rssi: r.rssi, connected: connected,
+                  name: disp,
+                  brand: brand ?? 'BLE', rssi: r.rssi, connected: connected,
                   onTap: () => connected
                       ? Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => ControlScreen(controller: _connected[r.device.remoteId.str]!, title: r.device.platformName)))
-                      : _connect(r.device));
+                          builder: (_) => ControlScreen(controller: _connected[r.device.remoteId.str]!, title: disp)))
+                      : _connect(r.device, nm));
               },
             );
           },
